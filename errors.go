@@ -32,4 +32,19 @@ var (
 
 	// ErrInvalidSealedData is returned when sealed data has invalid or missing fields
 	ErrInvalidSealedData = errors.New("sealed data has invalid or missing fields")
+
+	// ErrPCRMismatch is returned when PCR values do not match the sealed policy
+	ErrPCRMismatch = errors.New("PCR values do not match sealed policy")
+
+	// ErrPasswordRequired is returned when a password is required to unseal a key
+	ErrPasswordRequired = errors.New("password required to unseal this key")
+
+	// ErrInvalidPassword is returned when the provided password is incorrect
+	ErrInvalidPassword = errors.New("invalid password for sealed key")
+
+	// ErrPolicyFailed is returned when the policy session fails during unsealing
+	ErrPolicyFailed = errors.New("policy session failed")
+
+	// ErrInvalidPCRSelection is returned when PCR selection is invalid
+	ErrInvalidPCRSelection = errors.New("invalid PCR selection")
 )

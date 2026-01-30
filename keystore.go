@@ -102,10 +102,16 @@ func (s *FileKeyStore) Save(data *SealedData) error {
 		return ErrKeyStoreNotInitialized
 	}
 
-	// Ensure directory exists
+	// Ensure directory exists with restrictive permissions
 	dir := filepath.Dir(s.storePath)
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Set restrictive permissions on directory (platform-specific)
+	if err := setDirPermissions(dir); err != nil {
+		// Non-fatal: continue even if ACL setting fails
+		// The MkdirAll already set basic Unix permissions
 	}
 
 	// Marshal the sealed data to JSON
@@ -117,6 +123,12 @@ func (s *FileKeyStore) Save(data *SealedData) error {
 	// Write to file with restricted permissions (owner read/write only)
 	if err := os.WriteFile(s.storePath, jsonData, 0600); err != nil {
 		return fmt.Errorf("failed to write sealed key file: %w", err)
+	}
+
+	// Set restrictive permissions on file (platform-specific)
+	if err := setFilePermissions(s.storePath); err != nil {
+		// Non-fatal: continue even if ACL setting fails
+		// The WriteFile already set basic Unix permissions
 	}
 
 	return nil
