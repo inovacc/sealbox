@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/go-tpm/tpm"
+	"github.com/inovacc/keystore/internal/tpm/tpm"
 )
 
 var ownerAuthEnvVar = "TPM_OWNER_AUTH"

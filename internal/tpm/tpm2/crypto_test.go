@@ -11,8 +11,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/go-tpm/tpm2/transport"
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 // Subtle: Some RSA crypto libraries compute D (the private exponent)

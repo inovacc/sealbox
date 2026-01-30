@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 func TestMarshal2B(t *testing.T) {

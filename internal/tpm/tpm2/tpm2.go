@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/google/go-tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
 )
 
 // handle represents a TPM handle as comprehended in Part 3: Commands.

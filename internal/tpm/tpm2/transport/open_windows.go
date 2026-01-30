@@ -3,7 +3,7 @@
 package transport
 
 import (
-	legacy "github.com/google/go-tpm/legacy/tpm2"
+	legacy "github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 // OpenTPM opens the local system TPM.

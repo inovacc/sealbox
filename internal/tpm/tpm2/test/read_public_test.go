@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	. "github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	. "github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 // TestReadPublicKey compares the CreatePrimary response parameter outPublic with the output of ReadPublic outPublic.

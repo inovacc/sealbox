@@ -7,8 +7,8 @@ import (
 	"crypto/rand"
 	"testing"
 
-	. "github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	. "github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 // This test checks that Import can import an object in the clear.

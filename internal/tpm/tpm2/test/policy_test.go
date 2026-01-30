@@ -6,9 +6,9 @@ import (
 	"crypto/sha256"
 	"testing"
 
-	. "github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport"
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	. "github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 // This test isn't interesting, but it checks that you can omit the handles on `StartAuthSession`.

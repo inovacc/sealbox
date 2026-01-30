@@ -2,7 +2,63 @@
 
 A cross-platform Go package for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations.
 
-> **⚠️ Status: Development** - Contains critical bugs that block compilation. See [ROADMAP.md](ROADMAP.md) for details.
+> **Status: Development** - See [ROADMAP.md](ROADMAP.md) for progress.
+
+## What It Does
+
+This module provides **hardware-backed encryption key management** using your computer's TPM chip. Keys sealed to the TPM:
+
+- Cannot be extracted or copied
+- Only work on the machine where they were created
+- Are protected even if an attacker has full disk access
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Your Application                        │
+├─────────────────────────────────────────────────────────────┤
+│                    keystore package                          │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │ Initialize()│    │ GetSealed   │    │   Reset()   │     │
+│  │             │    │ MasterKey() │    │             │     │
+│  └──────┬──────┘    └──────┬──────┘    └─────────────┘     │
+├─────────┼──────────────────┼────────────────────────────────┤
+│         ▼                  ▼                                 │
+│  ┌─────────────┐    ┌─────────────┐                         │
+│  │ KeyManager  │    │  KeyStore   │                         │
+│  │ (TPM ops)   │    │ (file ops)  │                         │
+│  └──────┬──────┘    └──────┬──────┘                         │
+├─────────┼──────────────────┼────────────────────────────────┤
+│         ▼                  ▼                                 │
+│    TPM 2.0 Chip        Filesystem                           │
+│   (hardware)         (~/.config/app/)                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Key Sealing Process
+
+```
+SEAL (one-time setup):
+  Random 32 bytes  ──▶  TPM encrypts  ──▶  Sealed blob  ──▶  Save to disk
+
+UNSEAL (every use):
+  Load from disk  ──▶  TPM decrypts  ──▶  Original key  ──▶  Use in app
+```
+
+### Why Use TPM?
+
+| Without TPM | With TPM (this module) |
+|-------------|------------------------|
+| Key stored in plain file | Key encrypted by hardware |
+| Attacker copies file = has key | Attacker copies file = useless blob |
+| Key works on any machine | Key only works on THIS machine |
+| Software-only protection | Hardware-backed protection |
+
+## Use Cases
+
+- **Password Manager** - Derive master password from TPM-sealed key
+- **Credential Storage** - Protect API tokens, SSH keys
+- **Disk Encryption** - Seal disk encryption keys to TPM
+- **Application Secrets** - Machine-bound secret storage
 
 ## Features
 
@@ -52,44 +108,59 @@ func main() {
         log.Fatal("TPM not available on this system")
     }
 
-    // Create a new key manager
-    km, err := keystore.NewKeyManager()
-    if err != nil {
-        log.Fatalf("Failed to create key manager: %v", err)
-    }
-    defer km.Close()
+    // Configure storage path (required - no defaults)
+    // Option 1: Use platform-specific path
+    opts := keystore.WithAppConfig("myapp", "sealed.key")
+    // Option 2: Use explicit path
+    // opts := keystore.WithStorePath("/path/to/sealed.key")
 
-    // Generate and seal a random key
-    sealed, err := km.GenerateAndSealKey()
-    if err != nil {
-        log.Fatalf("Failed to seal key: %v", err)
-    }
-
-    // Store the sealed data
-    store, err := keystore.NewKeyStore()
-    if err != nil {
-        log.Fatalf("Failed to create key store: %v", err)
+    // Initialize: generate, seal, and store a new key
+    if err := keystore.Initialize(opts); err != nil {
+        if err == keystore.ErrKeyExists {
+            log.Println("Key already exists, skipping initialization")
+        } else {
+            log.Fatalf("Failed to initialize: %v", err)
+        }
     }
 
-    if err := store.Save(sealed); err != nil {
-        log.Fatalf("Failed to save sealed key: %v", err)
-    }
-
-    fmt.Printf("Key sealed and stored at: %s\n", store.Path())
-
-    // Later: unseal the key
-    loaded, err := store.Load()
+    // Later: retrieve the sealed key
+    key, err := keystore.GetSealedMasterKey(opts)
     if err != nil {
-        log.Fatalf("Failed to load sealed key: %v", err)
-    }
-
-    key, err := km.UnsealKey(loaded)
-    if err != nil {
-        log.Fatalf("Failed to unseal key: %v", err)
+        log.Fatalf("Failed to get sealed key: %v", err)
     }
 
     fmt.Printf("Unsealed key length: %d bytes\n", len(key))
 }
+```
+
+### Low-Level API
+
+For more control, use the KeyManager and KeyStore interfaces directly:
+
+```go
+km, err := keystore.NewKeyManager()
+if err != nil {
+    log.Fatal(err)
+}
+defer km.Close()
+
+// Generate and seal a random key
+sealed, err := km.GenerateAndSealKey()
+if err != nil {
+    log.Fatalf("Failed to seal key: %v", err)
+}
+
+// Store the sealed data (path is required)
+store, err := keystore.NewKeyStore(keystore.WithAppConfig("myapp", "sealed.key"))
+if err != nil {
+    log.Fatalf("Failed to create key store: %v", err)
+}
+
+if err := store.Save(sealed); err != nil {
+    log.Fatalf("Failed to save sealed key: %v", err)
+}
+
+fmt.Printf("Key sealed and stored at: %s\n", store.Path())
 ```
 
 ## API Reference
@@ -118,16 +189,28 @@ if err != nil {
 defer km.Close()
 ```
 
-#### `NewKeyStore() (KeyStore, error)`
+#### `NewKeyStore(opts ...KeyStoreOption) (*FileKeyStore, error)`
 
-Creates a key store for persisting sealed data to disk.
+Creates a key store for persisting sealed data to disk. **At least one option is required.**
 
 ```go
-store, err := keystore.NewKeyStore()
-if err != nil {
-    log.Fatal(err)
-}
+// Option 1: Platform-specific path (~/.config/myapp/sealed.key on Linux)
+store, err := keystore.NewKeyStore(keystore.WithAppConfig("myapp", "sealed.key"))
+
+// Option 2: Explicit path
+store, err := keystore.NewKeyStore(keystore.WithStorePath("/path/to/sealed.key"))
 ```
+
+#### `WithAppConfig(appName, fileName string) KeyStoreOption`
+
+Configures platform-specific storage path:
+- Linux: `~/.config/{appName}/{fileName}`
+- Windows: `%LOCALAPPDATA%\{appName}\{fileName}`
+- macOS: `~/Library/Application Support/{appName}/{fileName}`
+
+#### `WithStorePath(path string) KeyStoreOption`
+
+Sets an explicit storage path.
 
 ### Interfaces
 
@@ -185,11 +268,15 @@ type SealedData struct {
 
 ## Storage Locations
 
-| Platform | Sealed Key Path |
-|----------|-----------------|
-| Linux    | `~/.config/clonr/.clonr_sealed_key` |
-| Windows  | `%LOCALAPPDATA%\clonr\.clonr_sealed_key` |
-| macOS    | `~/Library/Application Support/clonr/.clonr_sealed_key` |
+When using `WithAppConfig(appName, fileName)`:
+
+| Platform | Path Template |
+|----------|---------------|
+| Linux    | `~/.config/{appName}/{fileName}` |
+| Windows  | `%LOCALAPPDATA%\{appName}\{fileName}` |
+| macOS    | `~/Library/Application Support/{appName}/{fileName}` |
+
+Example: `WithAppConfig("myapp", "master.key")` on Linux creates `~/.config/myapp/master.key`
 
 ## Security Considerations
 
@@ -265,11 +352,13 @@ Get-Tpm
 
 ```go
 var (
-    ErrTPMNotAvailable = errors.New("TPM device not available")
-    ErrTPMNotSupported = errors.New("TPM not supported on this platform")
-    ErrNoSealedKey     = errors.New("no sealed key found")
-    ErrSealFailed      = errors.New("failed to seal key to TPM")
-    ErrUnsealFailed    = errors.New("failed to unseal key from TPM")
+    ErrTPMNotAvailable        = errors.New("TPM device not available")
+    ErrTPMNotSupported        = errors.New("TPM not supported on this platform")
+    ErrNoSealedKey            = errors.New("no sealed key found")
+    ErrKeyExists              = errors.New("sealed key already exists")
+    ErrSealFailed             = errors.New("failed to seal key to TPM")
+    ErrUnsealFailed           = errors.New("failed to unseal key from TPM")
+    ErrKeyStoreNotInitialized = errors.New("key store not initialized")
 )
 ```
 
@@ -291,6 +380,10 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 
 - `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
   - See [internal/tpm/forked.md](internal/tpm/forked.md) for 46 tracked upstream issues
+
+## Examples
+
+- [secret-store](examples/secret-store/) - TPM-backed secret storage CLI application
 
 ## Documentation
 

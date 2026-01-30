@@ -3,7 +3,7 @@ package tpm2
 import (
 	"fmt"
 
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 type (

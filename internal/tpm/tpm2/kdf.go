@@ -3,7 +3,7 @@ package tpm2
 import (
 	"crypto"
 
-	legacy "github.com/google/go-tpm/legacy/tpm2"
+	legacy "github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 // KDFa implements TPM 2.0's default key derivation function, as defined in

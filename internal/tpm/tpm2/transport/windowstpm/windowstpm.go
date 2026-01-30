@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm/tpm2/transport"
-	"github.com/google/go-tpm/tpmutil/tbs"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil/tbs"
 )
 
 var (

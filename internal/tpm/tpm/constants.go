@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // Supported TPM commands.

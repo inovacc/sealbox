@@ -34,9 +34,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-tpm-tools/simulator"
-	. "github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm-tools/simulator"
+	. "github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 var (

@@ -21,7 +21,7 @@ import (
 	"encoding/pem"
 	"testing"
 
-	"github.com/google/go-tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 var (

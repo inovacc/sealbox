@@ -4,9 +4,20 @@ import "fmt"
 
 // Initialize creates and seals a new key to the TPM and stores it.
 // This is a high-level helper that combines KeyManager and KeyStore operations.
+// Returns ErrKeyExists if a sealed key already exists at the storage path.
 func Initialize(opts ...KeyStoreOption) error {
 	if !IsAvailable() {
 		return ErrTPMNotAvailable
+	}
+
+	// Check if key already exists
+	store, err := NewKeyStore(opts...)
+	if err != nil {
+		return fmt.Errorf("failed to create key store: %w", err)
+	}
+
+	if store.Exists() {
+		return ErrKeyExists
 	}
 
 	km, err := NewKeyManager()
@@ -19,12 +30,6 @@ func Initialize(opts ...KeyStoreOption) error {
 	sealedData, err := km.GenerateAndSealKey()
 	if err != nil {
 		return fmt.Errorf("failed to generate and seal key: %w", err)
-	}
-
-	// Save the sealed data to disk
-	store, err := NewKeyStore(opts...)
-	if err != nil {
-		return fmt.Errorf("failed to create key store: %w", err)
 	}
 
 	if err := store.Save(sealedData); err != nil {

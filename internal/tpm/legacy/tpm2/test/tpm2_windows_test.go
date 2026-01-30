@@ -19,7 +19,7 @@ import (
 	"io"
 	"testing"
 
-	. "github.com/google/go-tpm/legacy/tpm2"
+	. "github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 var runTPMTests = flag.Bool("use-tbs", false, "Run integration tests against Windows TPM Base Services (TBS). Defaults to false.")

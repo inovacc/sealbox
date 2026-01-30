@@ -8,8 +8,8 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 |--------|-------|
 | Local Issues | 10 (2 critical, 2 high, 4 medium, 2 low) |
 | Upstream Issues | 46 (3 critical, 8 high, 12 medium, 23 low) |
-| Test Coverage | 0% |
-| Build Status | ❌ Blocked (critical bugs) |
+| Test Coverage | 73.1% |
+| Build Status | ✅ Passing |
 
 ## Platform Status
 
@@ -27,23 +27,19 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 ### Critical (Blocks Compilation)
 
-- [ ] Fix package name mismatch
-  - [ ] `doc.go` declares `package tpm`, all others declare `package keystore`
-  - [ ] Decide on package name and update all files
+- [x] Fix package name mismatch
+  - [x] `doc.go` declares `package tpm`, all others declare `package keystore`
+  - [x] Updated doc comments to use `keystore` package name
 
-- [ ] Add missing constants in `keystore.go`
-  ```go
-  const (
-      DefaultKeyFileName = ".clonr_sealed_key"
-      DefaultAppName     = "clonr"
-  )
-  ```
+- [x] ~~Add missing constants~~ → Changed to require options (no defaults)
+  - [x] `NewKeyStore()` now requires `WithStorePath` or `WithAppConfig`
+  - [x] Returns `ErrKeyStoreNotInitialized` if no path provided
 
 ### High Priority
 
-- [ ] Fix duplicate option functions in `keystore.go:26-42`
-  - [ ] `WithAppName` and `WithFileName` have identical signatures and bodies
-  - [ ] `WithFileName` should only take `fileName` parameter
+- [x] Fix duplicate option functions in `keystore.go:26-42`
+  - [x] Removed duplicate `WithFileName` function
+  - [x] Renamed `WithAppName` to `WithAppConfig(appName, fileName)`
 
 - [ ] Fix redundant `SealedData` field
   - [ ] `SealedBlob` and `PrivateArea` are assigned identical values
@@ -51,22 +47,22 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 ### Medium Priority
 
-- [ ] Add nil checks
-  - [ ] `UnsealKey(data *SealedData)` - check if `data` is nil
-  - [ ] `Save(data *SealedData)` - check if `data` is nil
+- [x] Add nil checks
+  - [x] `UnsealKey(data *SealedData)` - check if `data` is nil
+  - [x] `Save(data *SealedData)` - check if `data` is nil
 
-- [ ] Fix `Initialize()` to check if key already exists
-  - [ ] Prevent silent overwrite of existing keys
+- [x] Fix `Initialize()` to check if key already exists
+  - [x] Returns `ErrKeyExists` if key already exists
 
-- [ ] Remove unused `device` field from `linuxKeyManager` struct
+- [x] Remove unused `device` field from `linuxKeyManager` struct
 
-- [ ] Fix typo in `types.go:47` comment: "There exists" → "Exists"
+- [x] Fix typo in `types.go:47` comment: "There exists" → "Exists"
 
 ### Deliverables
 
-- [ ] Code compiles without errors
-- [ ] All nil pointer dereferences prevented
-- [ ] No redundant code
+- [x] Code compiles without errors
+- [x] All nil pointer dereferences prevented
+- [ ] No redundant code (SealedBlob field still needs review)
 
 ---
 

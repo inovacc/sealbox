@@ -7,8 +7,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
 )
 
 // RunTest checks that the connection to the given TPM seems to be working.

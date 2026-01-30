@@ -29,8 +29,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // Labels for use in key derivation or OAEP encryption.

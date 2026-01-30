@@ -160,6 +160,10 @@ func (m *windowsKeyManager) SealKey(key []byte) (*SealedData, error) {
 
 // UnsealKey unseals a key from the TPM.
 func (m *windowsKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
+	if data == nil {
+		return nil, fmt.Errorf("%w: sealed data cannot be nil", ErrUnsealFailed)
+	}
+
 	// Recreate the primary key (deterministic, so same key as before)
 	primaryResp, err := m.createPrimaryKey()
 	if err != nil {

@@ -24,7 +24,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 var (

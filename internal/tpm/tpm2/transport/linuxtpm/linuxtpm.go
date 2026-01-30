@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/go-tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
 )
 
 var (

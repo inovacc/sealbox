@@ -3,8 +3,8 @@ package tpm2test
 import (
 	"testing"
 
-	. "github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	. "github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 func TestEvictControl(t *testing.T) {

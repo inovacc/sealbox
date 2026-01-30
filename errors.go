@@ -12,6 +12,9 @@ var (
 	// ErrNoSealedKey is returned when no sealed key exists
 	ErrNoSealedKey = errors.New("no sealed key found")
 
+	// ErrKeyExists is returned when trying to initialize but a key already exists
+	ErrKeyExists = errors.New("sealed key already exists")
+
 	// ErrSealFailed is returned when the sealing operation fails
 	ErrSealFailed = errors.New("failed to seal key to TPM")
 

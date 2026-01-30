@@ -25,7 +25,7 @@ import (
 	"math/big"
 	"reflect"
 
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // NVPublic contains the public area of an NV index.

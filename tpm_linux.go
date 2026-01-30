@@ -9,6 +9,8 @@ import (
 	"os"
 
 	"github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/linuxtpm"
 )
 
 const (
@@ -21,8 +23,7 @@ const (
 
 // linuxKeyManager implements KeyManager for Linux using TPM 2.0.
 type linuxKeyManager struct {
-	device string
-	tpm    transport.TPMCloser
+	tpm transport.TPMCloser
 }
 
 // IsAvailable checks if a TPM device is accessible on Linux.
@@ -60,8 +61,7 @@ func NewKeyManager() (KeyManager, error) {
 	}
 
 	return &linuxKeyManager{
-		device: device,
-		tpm:    tpmConn,
+		tpm: tpmConn,
 	}, nil
 }
 
@@ -189,6 +189,10 @@ func (m *linuxKeyManager) SealKey(key []byte) (*SealedData, error) {
 
 // UnsealKey unseals a key from the TPM.
 func (m *linuxKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
+	if data == nil {
+		return nil, fmt.Errorf("%w: sealed data cannot be nil", ErrUnsealFailed)
+	}
+
 	// Recreate the primary key (deterministic, so same key as before)
 	primaryResp, err := m.createPrimaryKey()
 	if err != nil {

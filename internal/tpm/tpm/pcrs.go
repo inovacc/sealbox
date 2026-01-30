@@ -21,7 +21,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // setPCR sets a PCR value as selected in a given mask.

@@ -4,7 +4,7 @@ package transport
 import (
 	"io"
 
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // TPM represents a logical connection to a TPM.

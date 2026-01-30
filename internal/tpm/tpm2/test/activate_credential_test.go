@@ -5,8 +5,8 @@ import (
 	"crypto/rand"
 	"testing"
 
-	. "github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport/simulator"
+	. "github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/simulator"
 )
 
 // p384Template is an SRK-like ECDH-P384 key based on the P384 EK template.
