@@ -41,9 +41,9 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
   - [x] Removed duplicate `WithFileName` function
   - [x] Renamed `WithAppName` to `WithAppConfig(appName, fileName)`
 
-- [ ] Fix redundant `SealedData` field
-  - [ ] `SealedBlob` and `PrivateArea` are assigned identical values
-  - [ ] Either remove `SealedBlob` or fix the assignment
+- [x] Fix redundant `SealedData` field
+  - [x] Removed `SealedBlob` field (was identical to `PrivateArea`)
+  - [x] Updated all references in code and docs
 
 ### Medium Priority
 
@@ -62,7 +62,7 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 - [x] Code compiles without errors
 - [x] All nil pointer dereferences prevented
-- [ ] No redundant code (SealedBlob field still needs review)
+- [x] No redundant code
 
 ---
 
@@ -72,10 +72,10 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 ### Tasks
 
-- [ ] Refactor platform code to reduce duplication
-  - [ ] `tpm_linux.go` and `tpm_windows.go` share ~95% identical code
-  - [ ] Extract shared TPM logic into common functions
-  - [ ] Keep only transport-specific code in platform files
+- [x] Refactor platform code to reduce duplication
+  - [x] Created `tpm_common.go` with `baseKeyManager` struct
+  - [x] Extracted shared TPM logic (SealKey, UnsealKey, GenerateAndSealKey, createPrimaryKey)
+  - [x] Platform files now only contain transport-specific code (~60 lines → ~35 lines each)
 
 - [ ] Add unit tests
   - [ ] `keystore.go` - FileKeyStore operations
@@ -299,14 +299,14 @@ Issues discovered during code analysis that need to be addressed:
 
 | Issue | Severity | File | Line |
 |-------|----------|------|------|
-| Package mismatch (`tpm` vs `keystore`) | Critical | `doc.go` | 59 |
-| Missing `DefaultAppName`, `DefaultKeyFileName` | Critical | `keystore.go` | 54 |
-| Duplicate `WithAppName`/`WithFileName` functions | High | `keystore.go` | 26-42 |
-| Redundant `SealedBlob` field | Medium | `types.go` | 13 |
-| No nil check in `UnsealKey` | Medium | `tpm_*.go` | - |
-| `Initialize` overwrites existing key | Medium | `helpers.go` | 7 |
-| Unused `device` field | Low | `tpm_linux.go` | 26 |
-| Typo "There exists" | Trivial | `types.go` | 47 |
+| ~~Package mismatch (`tpm` vs `keystore`)~~ | ~~Critical~~ | ~~`doc.go`~~ | ✅ Fixed |
+| ~~Missing defaults~~ | ~~Critical~~ | ~~`keystore.go`~~ | ✅ Changed to require options |
+| ~~Duplicate `WithAppName`/`WithFileName` functions~~ | ~~High~~ | ~~`keystore.go`~~ | ✅ Fixed |
+| ~~Redundant `SealedBlob` field~~ | ~~Medium~~ | ~~`types.go`~~ | ✅ Removed |
+| ~~No nil check in `UnsealKey`~~ | ~~Medium~~ | ~~`tpm_*.go`~~ | ✅ Fixed |
+| ~~`Initialize` overwrites existing key~~ | ~~Medium~~ | ~~`helpers.go`~~ | ✅ Fixed |
+| ~~Unused `device` field~~ | ~~Low~~ | ~~`tpm_linux.go`~~ | ✅ Removed |
+| ~~Typo "There exists"~~ | ~~Trivial~~ | ~~`types.go`~~ | ✅ Fixed |
 
 ---
 

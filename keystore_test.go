@@ -54,7 +54,6 @@ func TestFileKeyStore_SaveLoad(t *testing.T) {
 	data := &SealedData{
 		PublicArea:       []byte("public"),
 		PrivateArea:      []byte("private"),
-		SealedBlob:       []byte("blob"),
 		SealedBlobPublic: []byte("blob_public"),
 	}
 	if err := store.Save(data); err != nil {

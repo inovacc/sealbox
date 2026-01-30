@@ -261,7 +261,6 @@ type KeyStore interface {
 type SealedData struct {
     PublicArea       []byte `json:"public_area"`
     PrivateArea      []byte `json:"private_area"`
-    SealedBlob       []byte `json:"sealed_blob"`
     SealedBlobPublic []byte `json:"sealed_blob_public"`
 }
 ```

@@ -24,7 +24,7 @@ func TestNewKeyManager(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewKeyManager failed: %v", err)
 	}
-	defer km.Close()
+	defer func() { _ = km.Close() }()
 }
 
 func TestGenerateAndSealKey(t *testing.T) {
@@ -34,7 +34,7 @@ func TestGenerateAndSealKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewKeyManager failed: %v", err)
 	}
-	defer km.Close()
+	defer func() { _ = km.Close() }()
 
 	sealed, err := km.GenerateAndSealKey()
 	if err != nil {
@@ -59,7 +59,7 @@ func TestSealUnsealKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewKeyManager failed: %v", err)
 	}
-	defer km.Close()
+	defer func() { _ = km.Close() }()
 
 	// Generate and seal
 	original := []byte("test-key-material-32-bytes-long!")
@@ -86,7 +86,7 @@ func TestUnsealKey_NilData(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewKeyManager failed: %v", err)
 	}
-	defer km.Close()
+	defer func() { _ = km.Close() }()
 
 	_, err = km.UnsealKey(nil)
 	if err == nil {

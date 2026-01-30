@@ -3,16 +3,13 @@ package keystore
 // SealedData represents the data needed to unseal a key from the TPM.
 // This structure is platform-independent and can be serialized to JSON.
 type SealedData struct {
-	// PublicArea is the public portion of the sealing key
+	// PublicArea is the public portion of the primary sealing key
 	PublicArea []byte `json:"public_area"`
 
-	// PrivateArea is the encrypted private portion
+	// PrivateArea is the encrypted private portion of the sealed object
 	PrivateArea []byte `json:"private_area"`
 
-	// SealedBlob is the actual sealed data
-	SealedBlob []byte `json:"sealed_blob"`
-
-	// SealedBlobPublic is the public area of the sealed blob
+	// SealedBlobPublic is the public area of the sealed object
 	SealedBlobPublic []byte `json:"sealed_blob_public"`
 }
 
