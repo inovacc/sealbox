@@ -1,4 +1,4 @@
-package tpm
+package keystore
 
 // SealedData represents the data needed to unseal a key from the TPM.
 // This structure is platform-independent and can be serialized to JSON.
@@ -43,7 +43,7 @@ type KeyStore interface {
 	// Load retrieves sealed data from disk
 	Load() (*SealedData, error)
 
-	// There exists checks if sealed data exists
+	// Exists checks if sealed data exists
 	Exists() bool
 
 	// Delete removes sealed data from disk

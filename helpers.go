@@ -1,4 +1,4 @@
-package tpm
+package keystore
 
 import "fmt"
 

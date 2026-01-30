@@ -1,6 +1,6 @@
 //go:build linux
 
-package tpm
+package keystore
 
 import (
 	"crypto/rand"
@@ -8,9 +8,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport"
-	"github.com/google/go-tpm/tpm2/transport/linuxtpm"
+	"github.com/inovacc/keystore/internal/tpm/tpm2"
 )
 
 const (

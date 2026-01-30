@@ -1,6 +1,6 @@
 //go:build !linux && !windows
 
-package tpm
+package keystore
 
 // stubKeyManager is a placeholder for unsupported platforms.
 type stubKeyManager struct{}

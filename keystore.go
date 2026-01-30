@@ -1,4 +1,4 @@
-package tpm
+package keystore
 
 import (
 	"encoding/json"
@@ -6,14 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-)
-
-const (
-	// DefaultKeyFileName is the default name of the file storing the sealed key
-	DefaultKeyFileName = ".clonr_sealed_key"
-
-	// DefaultAppName is the default application name for storage paths
-	DefaultAppName = "clonr"
 )
 
 // FileKeyStore implements KeyStore using the filesystem.
@@ -24,42 +16,42 @@ type FileKeyStore struct {
 // KeyStoreOption configures a FileKeyStore.
 type KeyStoreOption func(*FileKeyStore)
 
-// WithStorePath sets a custom storage path.
+// WithStorePath sets a custom storage path directly.
+// Use this when you want full control over where the sealed key is stored.
 func WithStorePath(path string) KeyStoreOption {
 	return func(s *FileKeyStore) {
 		s.storePath = path
 	}
 }
 
-// WithAppName sets the application name for default path calculation.
-func WithAppName(appName string) KeyStoreOption {
+// WithAppConfig sets the application name and file name for platform-specific path calculation.
+// The path is calculated as:
+//   - Linux: ~/.config/{appName}/{fileName}
+//   - Windows: %LOCALAPPDATA%\{appName}\{fileName}
+//   - macOS: ~/Library/Application Support/{appName}/{fileName}
+func WithAppConfig(appName, fileName string) KeyStoreOption {
 	return func(s *FileKeyStore) {
 		if s.storePath == "" {
-			s.storePath = getDefaultStorePath(appName, DefaultKeyFileName)
-		}
-	}
-}
-
-// WithFileName sets the key file name for default path calculation.
-func WithFileName(fileName string) KeyStoreOption {
-	return func(s *FileKeyStore) {
-		if s.storePath == "" {
-			s.storePath = getDefaultStorePath(DefaultAppName, fileName)
+			s.storePath = getDefaultStorePath(appName, fileName)
 		}
 	}
 }
 
 // NewKeyStore creates a new FileKeyStore with the given options.
+// At least one option (WithStorePath or WithAppConfig) must be provided.
 func NewKeyStore(opts ...KeyStoreOption) (*FileKeyStore, error) {
+	if len(opts) == 0 {
+		return nil, ErrKeyStoreNotInitialized
+	}
+
 	s := &FileKeyStore{}
 
 	for _, opt := range opts {
 		opt(s)
 	}
 
-	// Use default path if not set
 	if s.storePath == "" {
-		s.storePath = getDefaultStorePath(DefaultAppName, DefaultKeyFileName)
+		return nil, ErrKeyStoreNotInitialized
 	}
 
 	return s, nil
@@ -102,6 +94,10 @@ func getDefaultStorePath(appName, fileName string) string {
 
 // Save stores sealed data to disk.
 func (s *FileKeyStore) Save(data *SealedData) error {
+	if data == nil {
+		return fmt.Errorf("sealed data cannot be nil")
+	}
+
 	if s.storePath == "" {
 		return ErrKeyStoreNotInitialized
 	}

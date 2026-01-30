@@ -1,4 +1,4 @@
-// Package tpm provides cross-platform TPM 2.0 key management.
+// Package keystore provides cross-platform TPM 2.0 key management.
 //
 // This package enables hardware-backed encryption using Trusted Platform Module (TPM) 2.0.
 // Keys sealed to the TPM are bound to the hardware and cannot be extracted or used on
@@ -13,17 +13,18 @@
 // # Quick Start
 //
 //	// Check availability
-//	if !tpm.IsAvailable() {
+//	if !keystore.IsAvailable() {
 //	    log.Fatal("TPM not available")
 //	}
 //
 //	// Initialize (creates and seals a new key)
-//	if err := tpm.Initialize(); err != nil {
+//	opts := keystore.WithStorePath("/path/to/sealed.key")
+//	if err := keystore.Initialize(opts); err != nil {
 //	    log.Fatal(err)
 //	}
 //
 //	// Later: retrieve the sealed key
-//	key, err := tpm.GetSealedMasterKey()
+//	key, err := keystore.GetSealedMasterKey(opts)
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
@@ -32,7 +33,7 @@
 //
 // For more control, use the KeyManager and KeyStore interfaces directly:
 //
-//	km, err := tpm.NewKeyManager()
+//	km, err := keystore.NewKeyManager()
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
@@ -43,7 +44,7 @@
 //	    log.Fatal(err)
 //	}
 //
-//	store, _ := tpm.NewKeyStore()
+//	store, _ := keystore.NewKeyStore(keystore.WithStorePath("/path/to/sealed.key"))
 //	store.Save(sealed)
 //
 // # Security Considerations
@@ -56,4 +57,4 @@
 //   - BIOS/UEFI updates may invalidate sealed keys
 //
 // See README.md for detailed security information.
-package tpm
+package keystore

@@ -1,6 +1,8 @@
-# TPM - Hardware-Backed Key Management
+# Keystore - Hardware-Backed Key Management
 
 A cross-platform Go package for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations.
+
+> **⚠️ Status: Development** - Contains critical bugs that block compilation. See [ROADMAP.md](ROADMAP.md) for details.
 
 ## Features
 
@@ -9,11 +11,12 @@ A cross-platform Go package for TPM 2.0 (Trusted Platform Module) key sealing an
 - **No password required** - Authentication happens automatically via TPM
 - **Secure key storage** - Sealed blobs stored in platform-specific secure locations
 - **Simple API** - Easy-to-use interfaces for key management
+- **Forked go-tpm** - Includes forked [google/go-tpm](https://github.com/google/go-tpm) for customization
 
 ## Installation
 
 ```bash
-go get github.com/inovacc/clonr/pkg/tpm
+go get github.com/inovacc/keystore
 ```
 
 ## Requirements
@@ -40,17 +43,17 @@ import (
     "fmt"
     "log"
 
-    "github.com/inovacc/clonr/pkg/tpm"
+    "github.com/inovacc/keystore"
 )
 
 func main() {
     // Check if TPM is available
-    if !tpm.IsAvailable() {
+    if !keystore.IsAvailable() {
         log.Fatal("TPM not available on this system")
     }
 
     // Create a new key manager
-    km, err := tpm.NewKeyManager()
+    km, err := keystore.NewKeyManager()
     if err != nil {
         log.Fatalf("Failed to create key manager: %v", err)
     }
@@ -63,7 +66,7 @@ func main() {
     }
 
     // Store the sealed data
-    store, err := tpm.NewKeyStore()
+    store, err := keystore.NewKeyStore()
     if err != nil {
         log.Fatalf("Failed to create key store: %v", err)
     }
@@ -98,7 +101,7 @@ func main() {
 Checks if TPM hardware is accessible on the current system.
 
 ```go
-if tpm.IsAvailable() {
+if keystore.IsAvailable() {
     fmt.Println("TPM is available")
 }
 ```
@@ -108,7 +111,7 @@ if tpm.IsAvailable() {
 Creates a new TPM key manager for sealing/unsealing operations.
 
 ```go
-km, err := tpm.NewKeyManager()
+km, err := keystore.NewKeyManager()
 if err != nil {
     log.Fatal(err)
 }
@@ -120,7 +123,7 @@ defer km.Close()
 Creates a key store for persisting sealed data to disk.
 
 ```go
-store, err := tpm.NewKeyStore()
+store, err := keystore.NewKeyStore()
 if err != nil {
     log.Fatal(err)
 }
@@ -235,7 +238,7 @@ password := DerivePassword(key, "keepass")
 
 ### Linux
 
-Uses `go-tpm` with the Linux TPM Resource Manager (`/dev/tpmrm0`).
+Uses forked `go-tpm` with the Linux TPM Resource Manager (`/dev/tpmrm0`).
 
 ```bash
 # Check TPM availability
@@ -248,7 +251,7 @@ newgrp tss  # Apply immediately
 
 ### Windows
 
-Uses `go-tpm` with Windows TPM Base Services (TBS).
+Uses forked `go-tpm` with Windows TPM Base Services (TBS).
 
 ```powershell
 # Check TPM status
@@ -274,22 +277,30 @@ var (
 
 ```bash
 # Run tests (requires TPM or simulator)
-go test -v ./pkg/tpm/...
+task test
 
-# Run with software TPM simulator
+# Or directly with go
+go test -v ./...
+
+# Run with software TPM simulator (Linux)
 swtpm socket --tpmstate dir=/tmp/tpm --tpm2 --ctrl type=tcp,port=2322 &
-TPM_DEVICE=/dev/null go test -v ./pkg/tpm/...
+TPM_DEVICE=/tmp/tpm go test -v ./...
 ```
 
 ## Dependencies
 
-- [github.com/google/go-tpm](https://github.com/google/go-tpm) - TPM 2.0 library
+- `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
+  - See [internal/tpm/forked.md](internal/tpm/forked.md) for 46 tracked upstream issues
+
+## Documentation
+
+- [ROADMAP.md](ROADMAP.md) - Development phases, local issues, timeline
+- [internal/tpm/forked.md](internal/tpm/forked.md) - Upstream go-tpm issues by priority
 
 ## License
 
-MIT License - See [LICENSE](../../LICENSE) for details.
+MIT License - See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions are welcome! Please see the [ROADMAP.md](ROADMAP.md) for planned features.
-# keystore
+Contributions are welcome! Please see the [ROADMAP.md](ROADMAP.md) for planned features and known issues.

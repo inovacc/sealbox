@@ -1,161 +1,141 @@
-# TPM Package Roadmap
+# Keystore Roadmap
 
-This roadmap outlines the development plan for the cross-platform TPM package.
+This roadmap outlines the development plan for the cross-platform TPM keystore package.
 
-## Current Status
+## Summary
+
+| Metric | Value |
+|--------|-------|
+| Local Issues | 10 (2 critical, 2 high, 4 medium, 2 low) |
+| Upstream Issues | 46 (3 critical, 8 high, 12 medium, 23 low) |
+| Test Coverage | 0% |
+| Build Status | ❌ Blocked (critical bugs) |
+
+## Platform Status
 
 | Platform | Status | Notes |
 |----------|--------|-------|
-| Linux    | ✅ Working | TPM 2.0 via `/dev/tpmrm0` |
-| Windows  | 🔲 Planned | TPM 2.0 via TBS API |
-| macOS    | 🔲 Research | Secure Enclave (not TPM) |
+| Linux    | ✅ Implemented | TPM 2.0 via `/dev/tpmrm0` |
+| Windows  | ✅ Implemented | TPM 2.0 via TBS API |
+| macOS    | 🔲 Stub | Returns `ErrTPMNotSupported` |
 
 ---
 
-## Phase 1: Package Foundation
+## Phase 1: Bug Fixes (Critical)
 
-**Goal:** Extract and refactor existing Linux TPM code into a reusable package.
+**Goal:** Fix compilation errors and bugs identified in code analysis.
 
-### Tasks
+### Critical (Blocks Compilation)
 
-- [ ] Create package structure
+- [ ] Fix package name mismatch
+  - [ ] `doc.go` declares `package tpm`, all others declare `package keystore`
+  - [ ] Decide on package name and update all files
+
+- [ ] Add missing constants in `keystore.go`
+  ```go
+  const (
+      DefaultKeyFileName = ".clonr_sealed_key"
+      DefaultAppName     = "clonr"
+  )
   ```
-  pkg/tpm/
-  ├── doc.go
-  ├── interfaces.go
-  ├── errors.go
-  ├── sealed_data.go
-  ├── keystore.go
-  ├── tpm_linux.go
-  ├── tpm_stub.go
-  └── tpm_test.go
-  ```
 
-- [ ] Define public interfaces
-  - [ ] `KeyManager` - TPM key operations
-  - [ ] `KeyStore` - Sealed data persistence
-  - [ ] `SealedData` - Cross-platform data structure
+### High Priority
 
-- [ ] Migrate Linux implementation
-  - [ ] Copy from `internal/core/tpm.go`
-  - [ ] Copy from `internal/core/tpm_keystore.go`
-  - [ ] Update to implement new interfaces
+- [ ] Fix duplicate option functions in `keystore.go:26-42`
+  - [ ] `WithAppName` and `WithFileName` have identical signatures and bodies
+  - [ ] `WithFileName` should only take `fileName` parameter
 
-- [ ] Create stub for unsupported platforms
-  - [ ] Return `ErrTPMNotSupported` on all operations
-  - [ ] `IsAvailable()` returns `false`
+- [ ] Fix redundant `SealedData` field
+  - [ ] `SealedBlob` and `PrivateArea` are assigned identical values
+  - [ ] Either remove `SealedBlob` or fix the assignment
 
-- [ ] Update `internal/core/` to use `pkg/tpm`
-  - [ ] Import new package
-  - [ ] Remove duplicated code
-  - [ ] Maintain backward compatibility
+### Medium Priority
+
+- [ ] Add nil checks
+  - [ ] `UnsealKey(data *SealedData)` - check if `data` is nil
+  - [ ] `Save(data *SealedData)` - check if `data` is nil
+
+- [ ] Fix `Initialize()` to check if key already exists
+  - [ ] Prevent silent overwrite of existing keys
+
+- [ ] Remove unused `device` field from `linuxKeyManager` struct
+
+- [ ] Fix typo in `types.go:47` comment: "There exists" → "Exists"
 
 ### Deliverables
 
-- [ ] Working `pkg/tpm` package
-- [ ] All existing tests passing
-- [ ] No breaking changes to clonr CLI
+- [ ] Code compiles without errors
+- [ ] All nil pointer dereferences prevented
+- [ ] No redundant code
 
 ---
 
-## Phase 2: Linux Hardening
+## Phase 2: Code Quality & Testing
 
-**Goal:** Improve Linux implementation with better testing and error handling.
+**Goal:** Reduce duplication, add tests, improve maintainability.
 
 ### Tasks
 
-- [ ] Add TPM simulator support for testing
+- [ ] Refactor platform code to reduce duplication
+  - [ ] `tpm_linux.go` and `tpm_windows.go` share ~95% identical code
+  - [ ] Extract shared TPM logic into common functions
+  - [ ] Keep only transport-specific code in platform files
+
+- [ ] Add unit tests
+  - [ ] `keystore.go` - FileKeyStore operations
+  - [ ] `helpers.go` - High-level API
+  - [ ] Mock KeyManager interface for testing
+
+- [ ] Add TPM simulator support for integration tests
   - [ ] Integration with `swtpm` (Software TPM)
   - [ ] CI pipeline with simulated TPM
-  - [ ] Mock interface for unit tests
+
+- [ ] Add input validation
+  - [ ] Validate key size in `SealKey()` (TPM has limits)
+  - [ ] Validate `SealedData` fields before unmarshaling
 
 - [ ] Improve error handling
   - [ ] Wrap all TPM errors with context
   - [ ] Add retry logic for transient failures
-  - [ ] Better error messages for common issues
+
+### Deliverables
+
+- [ ] 80%+ test coverage
+- [ ] CI pipeline with TPM simulator
+- [ ] Reduced code duplication
+
+---
+
+## Phase 3: Security Hardening
+
+**Goal:** Add security features and audit existing implementation.
+
+### Tasks
 
 - [ ] Add PCR (Platform Configuration Register) support
   - [ ] Seal keys to specific PCR values
   - [ ] Detect system state changes
   - [ ] Optional: Unseal only in known-good state
 
-- [ ] Performance optimizations
-  - [ ] Connection pooling for TPM device
-  - [ ] Benchmark sealing/unsealing operations
-  - [ ] Cache primary key handle
+- [ ] Add password/policy protection for sealed objects
+  - [ ] Currently uses `tpm2.PasswordAuth(nil)` (no protection)
+  - [ ] Add option for password-protected sealing
+
+- [ ] Windows file permissions
+  - [ ] Unix permissions `0600` have no effect on Windows
+  - [ ] Implement proper ACLs for Windows
 
 - [ ] Security audit
   - [ ] Review key derivation
   - [ ] Verify proper handle cleanup
   - [ ] Check for memory leaks of sensitive data
+  - [ ] Zero sensitive data after use
 
 ### Deliverables
 
-- [ ] 80%+ test coverage
-- [ ] CI pipeline with TPM simulator
-- [ ] Performance benchmarks
+- [ ] PCR policy sealing option
 - [ ] Security review document
-
----
-
-## Phase 3: Windows TPM 2.0
-
-**Goal:** Add Windows support using TPM Base Services (TBS).
-
-### Research
-
-The `go-tpm` library supports Windows via the TBS API:
-
-```go
-import "github.com/google/go-tpm/tpm2/transport/tbs"
-
-func openTPM() (transport.TPMCloser, error) {
-    return tbs.Open()
-}
-```
-
-### Tasks
-
-- [ ] Research Windows TPM APIs
-  - [x] Confirm `go-tpm` TBS support
-  - [ ] Test on Windows 10/11 with TPM
-  - [ ] Document permission requirements
-
-- [ ] Implement `tpm_windows.go`
-  - [ ] `IsAvailable()` - Check TBS accessibility
-  - [ ] `NewKeyManager()` - Open TBS connection
-  - [ ] `SealKey()` / `UnsealKey()` - Same logic as Linux
-  - [ ] `Close()` - Release TBS handle
-
-- [ ] Windows-specific key storage
-  - [ ] Path: `%LOCALAPPDATA%\clonr\.clonr_sealed_key`
-  - [ ] Proper file permissions (ACLs)
-  - [ ] Handle path with spaces
-
-- [ ] Testing
-  - [ ] Manual testing on Windows hardware
-  - [ ] CI with Windows runner (if TPM available)
-  - [ ] Cross-compile verification
-
-- [ ] Documentation
-  - [ ] Windows setup guide
-  - [ ] Troubleshooting common issues
-  - [ ] PowerShell commands for TPM status
-
-### Windows-Specific Considerations
-
-| Aspect | Details |
-|--------|---------|
-| API | TPM Base Services (TBS) via `go-tpm` |
-| Device | No device path needed (TBS handles it) |
-| Permissions | Standard user (no admin required) |
-| Storage | `%LOCALAPPDATA%\clonr\` |
-
-### Deliverables
-
-- [ ] Working Windows implementation
-- [ ] Windows installation guide
-- [ ] Cross-platform CI builds
+- [ ] Platform-appropriate file permissions
 
 ---
 
@@ -254,27 +234,6 @@ Return `ErrTPMNotSupported` on macOS, recommend Linux/Windows for TPM features.
 
 ### Planned Features
 
-#### PCR Policy Sealing
-
-Seal keys to Platform Configuration Register values:
-
-```go
-type SealOptions struct {
-    // PCRs to bind the key to
-    PCRSelection []int
-
-    // Expected PCR values (optional)
-    PCRValues map[int][]byte
-}
-
-func (km *KeyManager) SealKeyWithPolicy(key []byte, opts SealOptions) (*SealedData, error)
-```
-
-**Use cases:**
-- Unseal only with specific boot configuration
-- Detect tampering or system changes
-- Enterprise security policies
-
 #### Key Hierarchy
 
 Support multiple sealed keys under a primary:
@@ -304,7 +263,6 @@ func (km *KeyManager) CreateAttestation(nonce []byte) (*AttestationData, error)
 
 ### Deliverables
 
-- [ ] PCR policy sealing
 - [ ] Key hierarchy support
 - [ ] Remote attestation (if needed)
 
@@ -314,9 +272,9 @@ func (km *KeyManager) CreateAttestation(nonce []byte) (*AttestationData, error)
 
 | Phase | Target | Status |
 |-------|--------|--------|
-| Phase 1: Package Foundation | Q1 2025 | 🔲 Not Started |
-| Phase 2: Linux Hardening | Q1 2025 | 🔲 Not Started |
-| Phase 3: Windows TPM 2.0 | Q2 2025 | 🔲 Not Started |
+| Phase 1: Bug Fixes | Q1 2025 | 🔴 Blocked (Critical bugs) |
+| Phase 2: Code Quality & Testing | Q1 2025 | 🔲 Not Started |
+| Phase 3: Security Hardening | Q2 2025 | 🔲 Not Started |
 | Phase 4: macOS (Research) | Q2 2025 | 🔲 Not Started |
 | Phase 5: Advanced Features | Q3 2025 | 🔲 Not Started |
 
@@ -339,7 +297,28 @@ func (km *KeyManager) CreateAttestation(nonce []byte) (*AttestationData, error)
 
 ---
 
+## Known Issues
+
+Issues discovered during code analysis that need to be addressed:
+
+| Issue | Severity | File | Line |
+|-------|----------|------|------|
+| Package mismatch (`tpm` vs `keystore`) | Critical | `doc.go` | 59 |
+| Missing `DefaultAppName`, `DefaultKeyFileName` | Critical | `keystore.go` | 54 |
+| Duplicate `WithAppName`/`WithFileName` functions | High | `keystore.go` | 26-42 |
+| Redundant `SealedBlob` field | Medium | `types.go` | 13 |
+| No nil check in `UnsealKey` | Medium | `tpm_*.go` | - |
+| `Initialize` overwrites existing key | Medium | `helpers.go` | 7 |
+| Unused `device` field | Low | `tpm_linux.go` | 26 |
+| Typo "There exists" | Trivial | `types.go` | 47 |
+
+---
+
 ## Contributing
+
+### Before Contributing
+
+⚠️ **Note:** Phase 1 bugs must be fixed before the code compiles. Start there.
 
 ### Adding a New Platform
 
@@ -369,6 +348,11 @@ defer func() {
     flushContext := tpm2.FlushContext{FlushHandle: handle}
     _, _ = flushContext.Execute(tpm)
 }()
+
+// Always check for nil before dereferencing
+if data == nil {
+    return nil, errors.New("data cannot be nil")
+}
 ```
 
 ---

@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Cross-platform Go library for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations. Hardware-bound encryption where sealed keys cannot be extracted or used on other machines.
+Cross-platform Go library (`package keystore`) for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations. Hardware-bound encryption where sealed keys cannot be extracted or used on other machines.
+
+**Status:** Development - contains critical bugs that block compilation (see Known Issues).
 
 ## Build & Test Commands
 
@@ -20,6 +22,21 @@ task build:dev         # Build development snapshot with goreleaser
 Single test: `go test -v -run TestFunctionName ./...`
 
 ## Architecture
+
+### Project Structure
+
+```
+keystore/
+├── *.go                    # Public API (package keystore)
+├── internal/tpm/           # Forked go-tpm library
+│   ├── forked.md           # Attribution & upstream issues
+│   ├── examples/           # TPM usage examples
+│   ├── legacy/tpm2/        # Legacy TPM 2.0 API
+│   ├── tpm/                # TPM 1.2 support
+│   └── tpm2/               # TPM 2.0 core (transport/, test/)
+├── ROADMAP.md              # Development phases & local issues
+└── CLAUDE.md               # This file
+```
 
 ### Platform-Specific Implementation Pattern
 
@@ -48,7 +65,19 @@ All platform files export the same public functions (`IsAvailable()`, `NewKeyMan
 
 ## Dependencies
 
-- `github.com/google/go-tpm` - TPM 2.0 library (uses `tpm2` and `transport` subpackages)
+- `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
+  - See `internal/tpm/forked.md` for upstream issues (46 open)
+
+## Known Issues (Critical)
+
+Must be fixed before code compiles:
+
+| Issue | File | Line |
+|-------|------|------|
+| Package mismatch: `doc.go` = `package tpm`, others = `package keystore` | `doc.go` | 59 |
+| Missing `DefaultAppName`, `DefaultKeyFileName` constants | `keystore.go` | 54 |
+
+See `ROADMAP.md` for full issue list and development phases.
 
 ## Testing Notes
 

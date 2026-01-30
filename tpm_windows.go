@@ -1,15 +1,15 @@
 //go:build windows
 
-package tpm
+package keystore
 
 import (
 	"crypto/rand"
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport"
-	"github.com/google/go-tpm/tpm2/transport/windowstpm"
+	"github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport/windowstpm"
 )
 
 const (
