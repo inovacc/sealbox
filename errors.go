@@ -23,4 +23,13 @@ var (
 
 	// ErrKeyStoreNotInitialized is returned when the key store is not initialized
 	ErrKeyStoreNotInitialized = errors.New("key store not initialized")
+
+	// ErrKeyTooLarge is returned when the key exceeds the maximum sealable size
+	ErrKeyTooLarge = errors.New("key exceeds maximum sealable size (1024 bytes)")
+
+	// ErrKeyEmpty is returned when trying to seal an empty key
+	ErrKeyEmpty = errors.New("cannot seal empty key")
+
+	// ErrInvalidSealedData is returned when sealed data has invalid or missing fields
+	ErrInvalidSealedData = errors.New("sealed data has invalid or missing fields")
 )

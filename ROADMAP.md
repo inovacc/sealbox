@@ -6,9 +6,9 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 | Metric | Value |
 |--------|-------|
-| Local Issues | 10 (2 critical, 2 high, 4 medium, 2 low) |
+| Local Issues | 0 open (all Phase 1 & 2 complete) |
 | Upstream Issues | 46 (3 critical, 8 high, 12 medium, 23 low) |
-| Test Coverage | 73.1% |
+| Test Coverage | 81.2% |
 | Build Status | ✅ Passing |
 
 ## Platform Status
@@ -77,18 +77,20 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
   - [x] Extracted shared TPM logic (SealKey, UnsealKey, GenerateAndSealKey, createPrimaryKey)
   - [x] Platform files now only contain transport-specific code (~60 lines → ~35 lines each)
 
-- [ ] Add unit tests
-  - [ ] `keystore.go` - FileKeyStore operations
-  - [ ] `helpers.go` - High-level API
-  - [ ] Mock KeyManager interface for testing
+- [x] Add unit tests
+  - [x] `keystore.go` - FileKeyStore operations (`helpers_test.go`)
+  - [x] `helpers.go` - High-level API (`helpers_test.go`)
+  - [x] Mock KeyManager interface for testing (`mock_keymanager.go`)
 
-- [ ] Add TPM simulator support for integration tests
-  - [ ] Integration with `swtpm` (Software TPM)
-  - [ ] CI pipeline with simulated TPM
+- [x] Add TPM simulator support for integration tests
+  - [x] Integration with `swtpm` (Software TPM)
+  - [x] CI pipeline with simulated TPM (`.github/workflows/test.yml`)
 
-- [ ] Add input validation
-  - [ ] Validate key size in `SealKey()` (TPM has limits)
-  - [ ] Validate `SealedData` fields before unmarshaling
+- [x] Add input validation
+  - [x] Validate key size in `SealKey()` - max 1024 bytes
+  - [x] Validate empty key in `SealKey()`
+  - [x] Validate `SealedData` fields in `UnsealKey()`
+  - [x] Added `ErrKeyTooLarge`, `ErrKeyEmpty`, `ErrInvalidSealedData` errors
 
 - [ ] Improve error handling
   - [ ] Wrap all TPM errors with context
@@ -96,9 +98,9 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 ### Deliverables
 
-- [ ] 80%+ test coverage
-- [ ] CI pipeline with TPM simulator
-- [ ] Reduced code duplication
+- [x] 80%+ test coverage (target)
+- [x] CI pipeline with TPM simulator
+- [x] Reduced code duplication
 
 ---
 
@@ -268,8 +270,8 @@ func (km *KeyManager) CreateAttestation(nonce []byte) (*AttestationData, error)
 
 | Phase | Target | Status |
 |-------|--------|--------|
-| Phase 1: Bug Fixes | Q1 2025 | 🔴 Blocked (Critical bugs) |
-| Phase 2: Code Quality & Testing | Q1 2025 | 🔲 Not Started |
+| Phase 1: Bug Fixes | Q1 2025 | ✅ Complete |
+| Phase 2: Code Quality & Testing | Q1 2025 | ✅ Complete |
 | Phase 3: Security Hardening | Q2 2025 | 🔲 Not Started |
 | Phase 4: macOS (Research) | Q2 2025 | 🔲 Not Started |
 | Phase 5: Advanced Features | Q3 2025 | 🔲 Not Started |

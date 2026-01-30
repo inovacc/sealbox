@@ -63,6 +63,16 @@ tasks:
     cmds:
       - go test -v -short ./...
 
+  test:mock:
+    desc: Run tests with mock (no TPM hardware required)
+    cmds:
+      - go test -v -short ./...
+
+  test:integration:
+    desc: Run integration tests (requires TPM or swtpm)
+    cmds:
+      - go test -v -run ".*Integration.*" ./...
+
   # === CODE QUALITY ===
   fmt:
     desc: Format all Go code

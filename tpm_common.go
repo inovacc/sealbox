@@ -14,6 +14,9 @@ import (
 const (
 	// sealedKeySize is the key size for sealed keys (32 bytes = 256 bits for AES-256)
 	sealedKeySize = 32
+
+	// maxSealableSize is the maximum size of data that can be sealed to the TPM
+	maxSealableSize = 1024
 )
 
 // baseKeyManager contains common TPM operations shared across platforms.
@@ -71,6 +74,13 @@ func (m *baseKeyManager) createPrimaryKey() (*tpm2.CreatePrimaryResponse, error)
 
 // SealKey seals a key to the TPM.
 func (m *baseKeyManager) SealKey(key []byte) (*SealedData, error) {
+	if len(key) == 0 {
+		return nil, ErrKeyEmpty
+	}
+	if len(key) > maxSealableSize {
+		return nil, fmt.Errorf("%w: got %d bytes", ErrKeyTooLarge, len(key))
+	}
+
 	primaryResp, err := m.createPrimaryKey()
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to create primary key: %v", ErrSealFailed, err)
@@ -131,6 +141,9 @@ func (m *baseKeyManager) SealKey(key []byte) (*SealedData, error) {
 func (m *baseKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
 	if data == nil {
 		return nil, fmt.Errorf("%w: sealed data cannot be nil", ErrUnsealFailed)
+	}
+	if len(data.PublicArea) == 0 || len(data.PrivateArea) == 0 || len(data.SealedBlobPublic) == 0 {
+		return nil, ErrInvalidSealedData
 	}
 
 	primaryResp, err := m.createPrimaryKey()

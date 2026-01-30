@@ -149,19 +149,22 @@ func TestGetDefaultStorePath(t *testing.T) {
 	}{
 		{"myapp", "key.dat"},
 		{"testapp", ".sealed_key"},
+		{"another-app", "secrets.json"},
 	}
 
 	for _, tt := range tests {
-		path := getDefaultStorePath(tt.appName, tt.fileName)
-		if path == "" {
-			t.Errorf("getDefaultStorePath(%q, %q) returned empty path", tt.appName, tt.fileName)
-		}
-		if !contains(path, tt.appName) {
-			t.Errorf("expected path to contain %q, got %s", tt.appName, path)
-		}
-		if !contains(path, tt.fileName) {
-			t.Errorf("expected path to contain %q, got %s", tt.fileName, path)
-		}
+		t.Run(tt.appName, func(t *testing.T) {
+			path := getDefaultStorePath(tt.appName, tt.fileName)
+			if path == "" {
+				t.Errorf("getDefaultStorePath(%q, %q) returned empty path", tt.appName, tt.fileName)
+			}
+			if !contains(path, tt.appName) {
+				t.Errorf("expected path to contain %q, got %s", tt.appName, path)
+			}
+			if !contains(path, tt.fileName) {
+				t.Errorf("expected path to contain %q, got %s", tt.fileName, path)
+			}
+		})
 	}
 }
 
@@ -213,6 +216,123 @@ func TestReset(t *testing.T) {
 	// Verify deleted
 	if HasKey(opts) {
 		t.Error("expected HasKey to return false after Reset")
+	}
+}
+
+func TestReset_NoOptions(t *testing.T) {
+	err := Reset()
+	if err == nil {
+		t.Error("expected error with no options")
+	}
+}
+
+func TestGetKeyStorePath_NoOptions(t *testing.T) {
+	_, err := GetKeyStorePath()
+	if err != ErrKeyStoreNotInitialized {
+		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
+	}
+}
+
+func TestHasKey_NoOptions(t *testing.T) {
+	if HasKey() {
+		t.Error("expected HasKey to return false with no options")
+	}
+}
+
+func TestWithStorePath_Priority(t *testing.T) {
+	// WithStorePath should take precedence over WithAppConfig
+	customPath := filepath.Join(t.TempDir(), "custom.key")
+	store, err := NewKeyStore(
+		WithAppConfig("myapp", "default.key"),
+		WithStorePath(customPath),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if store.Path() != customPath {
+		t.Errorf("expected custom path %s, got %s", customPath, store.Path())
+	}
+}
+
+func TestFileKeyStore_SaveCreatesDirectory(t *testing.T) {
+	tmpDir := t.TempDir()
+	nestedPath := filepath.Join(tmpDir, "nested", "deep", "test.key")
+
+	store, err := NewKeyStore(WithStorePath(nestedPath))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	data := &SealedData{
+		PublicArea:       []byte("public"),
+		PrivateArea:      []byte("private"),
+		SealedBlobPublic: []byte("blob"),
+	}
+
+	if err := store.Save(data); err != nil {
+		t.Fatalf("Save failed: %v", err)
+	}
+
+	// Verify the file was created
+	if !store.Exists() {
+		t.Error("expected file to exist after save")
+	}
+}
+
+func TestFileKeyStore_LoadInvalidJSON(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "test.key")
+
+	// Write invalid JSON
+	if err := os.WriteFile(path, []byte("not valid json"), 0600); err != nil {
+		t.Fatalf("failed to write file: %v", err)
+	}
+
+	store, err := NewKeyStore(WithStorePath(path))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	_, err = store.Load()
+	if err == nil {
+		t.Error("expected error loading invalid JSON")
+	}
+}
+
+func TestFileKeyStore_ExistsEmptyPath(t *testing.T) {
+	store := &FileKeyStore{storePath: ""}
+	if store.Exists() {
+		t.Error("expected Exists to return false for empty path")
+	}
+}
+
+func TestFileKeyStore_DeleteEmptyPath(t *testing.T) {
+	store := &FileKeyStore{storePath: ""}
+	err := store.Delete()
+	if err != ErrKeyStoreNotInitialized {
+		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
+	}
+}
+
+func TestFileKeyStore_SaveEmptyPath(t *testing.T) {
+	store := &FileKeyStore{storePath: ""}
+	err := store.Save(&SealedData{PublicArea: []byte("test")})
+	if err != ErrKeyStoreNotInitialized {
+		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
+	}
+}
+
+func TestFileKeyStore_LoadEmptyPath(t *testing.T) {
+	store := &FileKeyStore{storePath: ""}
+	_, err := store.Load()
+	if err != ErrKeyStoreNotInitialized {
+		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
+	}
+}
+
+func TestFileKeyStore_PathEmpty(t *testing.T) {
+	store := &FileKeyStore{storePath: ""}
+	if store.Path() != "" {
+		t.Error("expected empty path")
 	}
 }
 
