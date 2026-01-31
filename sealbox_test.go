@@ -26,21 +26,6 @@ func TestNewKeyStore_WithStorePath(t *testing.T) {
 	}
 }
 
-func TestNewKeyStore_WithAppConfig(t *testing.T) {
-	store, err := NewKeyStore(WithAppConfig("testapp", "test.key"))
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	if store.Path() == "" {
-		t.Error("expected non-empty path")
-	}
-	// Verify path contains app name
-	if !contains(store.Path(), "testapp") {
-		t.Errorf("expected path to contain 'testapp', got %s", store.Path())
-	}
-}
-
 func TestFileKeyStore_SaveLoad(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "test.key")
 
@@ -151,34 +136,6 @@ func TestFileKeyStore_DeleteNonExistent(t *testing.T) {
 	}
 }
 
-func TestGetDefaultStorePath(t *testing.T) {
-	tests := []struct {
-		appName  string
-		fileName string
-	}{
-		{"myapp", "key.dat"},
-		{"testapp", ".sealed_key"},
-		{"another-app", "secrets.json"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.appName, func(t *testing.T) {
-			path := getDefaultStorePath(tt.appName, tt.fileName)
-			if path == "" {
-				t.Errorf("getDefaultStorePath(%q, %q) returned empty path", tt.appName, tt.fileName)
-			}
-
-			if !contains(path, tt.appName) {
-				t.Errorf("expected path to contain %q, got %s", tt.appName, path)
-			}
-
-			if !contains(path, tt.fileName) {
-				t.Errorf("expected path to contain %q, got %s", tt.fileName, path)
-			}
-		})
-	}
-}
-
 func TestHasKey(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "test.key")
 	opts := WithStorePath(path)
@@ -248,23 +205,6 @@ func TestGetKeyStorePath_NoOptions(t *testing.T) {
 func TestHasKey_NoOptions(t *testing.T) {
 	if HasKey() {
 		t.Error("expected HasKey to return false with no options")
-	}
-}
-
-func TestWithStorePath_Priority(t *testing.T) {
-	// WithStorePath should take precedence over WithAppConfig
-	customPath := filepath.Join(t.TempDir(), "custom.key")
-
-	store, err := NewKeyStore(
-		WithAppConfig("myapp", "default.key"),
-		WithStorePath(customPath),
-	)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	if store.Path() != customPath {
-		t.Errorf("expected custom path %s, got %s", customPath, store.Path())
 	}
 }
 

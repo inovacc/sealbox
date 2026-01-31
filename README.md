@@ -112,10 +112,7 @@ func main() {
     }
 
     // Configure storage path (required - no defaults)
-    // Option 1: Use platform-specific path
-    opts := sealbox.WithAppConfig("myapp", "sealed.key")
-    // Option 2: Use explicit path
-    // opts := sealbox.WithStorePath("/path/to/sealed.key")
+    opts := sealbox.WithStorePath("/path/to/sealed.key")
 
     // Initialize: generate, seal, and store a new key
     if err := sealbox.Initialize(opts); err != nil {
@@ -154,7 +151,7 @@ if err != nil {
 }
 
 // Store the sealed data (path is required)
-store, err := sealbox.NewKeyStore(sealbox.WithAppConfig("myapp", "sealed.key"))
+store, err := sealbox.NewKeyStore(sealbox.WithStorePath("/path/to/sealed.key"))
 if err != nil {
     log.Fatalf("Failed to create key store: %v", err)
 }
@@ -248,26 +245,15 @@ defer km.Close()
 
 #### `NewKeyStore(opts ...KeyStoreOption) (*FileKeyStore, error)`
 
-Creates a key store for persisting sealed data to disk. **At least one option is required.**
+Creates a key store for persisting sealed data to disk. **WithStorePath is required.**
 
 ```go
-// Option 1: Platform-specific path (~/.config/myapp/sealed.key on Linux)
-store, err := sealbox.NewKeyStore(sealbox.WithAppConfig("myapp", "sealed.key"))
-
-// Option 2: Explicit path
 store, err := sealbox.NewKeyStore(sealbox.WithStorePath("/path/to/sealed.key"))
 ```
 
-#### `WithAppConfig(appName, fileName string) KeyStoreOption`
-
-Configures platform-specific storage path:
-- Linux: `~/.config/{appName}/{fileName}`
-- Windows: `%LOCALAPPDATA%\{appName}\{fileName}`
-- macOS: `~/Library/Application Support/{appName}/{fileName}`
-
 #### `WithStorePath(path string) KeyStoreOption`
 
-Sets an explicit storage path.
+Sets the storage path for the sealed key file. This option is required - there is no default path.
 
 ### Interfaces
 
@@ -367,18 +353,6 @@ sealbox.WithPCRDigest(hash tpm2.TPMIAlgHash, digest []byte, pcrs ...uint)
 // Enable session encryption
 sealbox.WithSessionEncryption()
 ```
-
-## Storage Locations
-
-When using `WithAppConfig(appName, fileName)`:
-
-| Platform | Path Template |
-|----------|---------------|
-| Linux    | `~/.config/{appName}/{fileName}` |
-| Windows  | `%LOCALAPPDATA%\{appName}\{fileName}` |
-| macOS    | `~/Library/Application Support/{appName}/{fileName}` |
-
-Example: `WithAppConfig("myapp", "master.key")` on Linux creates `~/.config/myapp/master.key`
 
 ## Security Considerations
 

@@ -1,4 +1,4 @@
-// Package keystore provides cross-platform TPM 2.0 key management.
+// Package sealbox provides cross-platform TPM 2.0 key management.
 //
 // This package enables hardware-backed encryption using Trusted Platform Module (TPM) 2.0.
 // Keys sealed to the TPM are bound to the hardware and cannot be extracted or used on

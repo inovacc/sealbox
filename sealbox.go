@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 )
 
 // FileKeyStore implements KeyStore using the filesystem.
@@ -16,29 +15,16 @@ type FileKeyStore struct {
 // KeyStoreOption configures a FileKeyStore.
 type KeyStoreOption func(*FileKeyStore)
 
-// WithStorePath sets a custom storage path directly.
-// Use this when you want full control over where the sealed key is stored.
+// WithStorePath sets the storage path for the sealed key file.
+// The path must always be provided - there is no default.
 func WithStorePath(path string) KeyStoreOption {
 	return func(s *FileKeyStore) {
 		s.storePath = path
 	}
 }
 
-// WithAppConfig sets the application name and file name for platform-specific path calculation.
-// The path is calculated as:
-//   - Linux: ~/.config/{appName}/{fileName}
-//   - Windows: %LOCALAPPDATA%\{appName}\{fileName}
-//   - macOS: ~/Library/Application Support/{appName}/{fileName}
-func WithAppConfig(appName, fileName string) KeyStoreOption {
-	return func(s *FileKeyStore) {
-		if s.storePath == "" {
-			s.storePath = getDefaultStorePath(appName, fileName)
-		}
-	}
-}
-
 // NewKeyStore creates a new FileKeyStore with the given options.
-// At least one option (WithStorePath or WithAppConfig) must be provided.
+// WithStorePath must be provided to specify where the sealed key is stored.
 func NewKeyStore(opts ...KeyStoreOption) (*FileKeyStore, error) {
 	if len(opts) == 0 {
 		return nil, ErrKeyStoreNotInitialized
@@ -57,43 +43,6 @@ func NewKeyStore(opts ...KeyStoreOption) (*FileKeyStore, error) {
 	return s, nil
 }
 
-// getDefaultStorePath returns the platform-specific default storage path.
-func getDefaultStorePath(appName, fileName string) string {
-	var configDir string
-
-	switch runtime.GOOS {
-	case "windows":
-		configDir = os.Getenv("LOCALAPPDATA")
-		if configDir == "" {
-			configDir = os.Getenv("APPDATA")
-		}
-
-		configDir = filepath.Join(configDir, appName)
-
-	case "darwin":
-		home, err := os.UserHomeDir()
-		if err != nil {
-			home = "."
-		}
-
-		configDir = filepath.Join(home, "Library", "Application Support", appName)
-
-	default: // linux and others
-		configDir = os.Getenv("XDG_CONFIG_HOME")
-		if configDir == "" {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				home = "."
-			}
-
-			configDir = filepath.Join(home, ".config", appName)
-		} else {
-			configDir = filepath.Join(configDir, appName)
-		}
-	}
-
-	return filepath.Join(configDir, fileName)
-}
 
 // Save stores sealed data to disk.
 func (s *FileKeyStore) Save(data *SealedData) error {
