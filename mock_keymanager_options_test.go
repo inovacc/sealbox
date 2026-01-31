@@ -23,9 +23,11 @@ func TestMockKeyManagerSealWithOptions(t *testing.T) {
 		if sealed.Version != SealedDataV2 {
 			t.Errorf("Version = %d, want %d", sealed.Version, SealedDataV2)
 		}
+
 		if !sealed.HasPassword {
 			t.Error("HasPassword should be true")
 		}
+
 		if len(sealed.PolicyDigest) == 0 {
 			t.Error("PolicyDigest should not be empty")
 		}
@@ -49,9 +51,11 @@ func TestMockKeyManagerSealWithOptions(t *testing.T) {
 		if sealed.PCRSelection == nil {
 			t.Fatal("PCRSelection should not be nil")
 		}
+
 		if len(sealed.PCRSelection.PCRs) != 2 {
 			t.Errorf("len(PCRs) = %d, want 2", len(sealed.PCRSelection.PCRs))
 		}
+
 		if len(sealed.PCRSelection.Digest) == 0 {
 			t.Error("PCR Digest should not be empty")
 		}
@@ -77,6 +81,7 @@ func TestMockKeyManagerSealWithOptions(t *testing.T) {
 		if !sealed.HasPassword {
 			t.Error("HasPassword should be true")
 		}
+
 		if sealed.PCRSelection == nil {
 			t.Fatal("PCRSelection should not be nil")
 		}
@@ -204,6 +209,7 @@ func TestMockKeyManagerGenerateAndSealWithOptions(t *testing.T) {
 	if !sealed.HasPassword {
 		t.Error("HasPassword should be true")
 	}
+
 	if sealed.Version != SealedDataV2 {
 		t.Errorf("Version = %d, want %d", sealed.Version, SealedDataV2)
 	}
@@ -222,6 +228,7 @@ func TestMockKeyManagerReadPCRs(t *testing.T) {
 	// Set some mock PCRs
 	pcr0 := bytes.Repeat([]byte{0x11}, 32)
 	pcr7 := bytes.Repeat([]byte{0x77}, 32)
+
 	m.SetMockPCR(0, pcr0)
 	m.SetMockPCR(7, pcr7)
 
@@ -237,6 +244,7 @@ func TestMockKeyManagerReadPCRs(t *testing.T) {
 	if !bytes.Equal(values[0], pcr0) {
 		t.Errorf("PCR 0 value mismatch")
 	}
+
 	if !bytes.Equal(values[1], pcr7) {
 		t.Errorf("PCR 7 value mismatch")
 	}

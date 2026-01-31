@@ -15,10 +15,12 @@ func TestNewKeyStore_RequiresOption(t *testing.T) {
 
 func TestNewKeyStore_WithStorePath(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "test.key")
+
 	store, err := NewKeyStore(WithStorePath(path))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if store.Path() != path {
 		t.Errorf("expected path %s, got %s", path, store.Path())
 	}
@@ -29,6 +31,7 @@ func TestNewKeyStore_WithAppConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if store.Path() == "" {
 		t.Error("expected non-empty path")
 	}
@@ -40,6 +43,7 @@ func TestNewKeyStore_WithAppConfig(t *testing.T) {
 
 func TestFileKeyStore_SaveLoad(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "test.key")
+
 	store, err := NewKeyStore(WithStorePath(path))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -74,6 +78,7 @@ func TestFileKeyStore_SaveLoad(t *testing.T) {
 	if string(loaded.PublicArea) != "public" {
 		t.Errorf("expected PublicArea 'public', got '%s'", loaded.PublicArea)
 	}
+
 	if string(loaded.PrivateArea) != "private" {
 		t.Errorf("expected PrivateArea 'private', got '%s'", loaded.PrivateArea)
 	}
@@ -81,6 +86,7 @@ func TestFileKeyStore_SaveLoad(t *testing.T) {
 
 func TestFileKeyStore_SaveNilData(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "test.key")
+
 	store, err := NewKeyStore(WithStorePath(path))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -94,6 +100,7 @@ func TestFileKeyStore_SaveNilData(t *testing.T) {
 
 func TestFileKeyStore_LoadNonExistent(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nonexistent.key")
+
 	store, err := NewKeyStore(WithStorePath(path))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -107,6 +114,7 @@ func TestFileKeyStore_LoadNonExistent(t *testing.T) {
 
 func TestFileKeyStore_Delete(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "test.key")
+
 	store, err := NewKeyStore(WithStorePath(path))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -131,6 +139,7 @@ func TestFileKeyStore_Delete(t *testing.T) {
 
 func TestFileKeyStore_DeleteNonExistent(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nonexistent.key")
+
 	store, err := NewKeyStore(WithStorePath(path))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -158,9 +167,11 @@ func TestGetDefaultStorePath(t *testing.T) {
 			if path == "" {
 				t.Errorf("getDefaultStorePath(%q, %q) returned empty path", tt.appName, tt.fileName)
 			}
+
 			if !contains(path, tt.appName) {
 				t.Errorf("expected path to contain %q, got %s", tt.appName, path)
 			}
+
 			if !contains(path, tt.fileName) {
 				t.Errorf("expected path to contain %q, got %s", tt.fileName, path)
 			}
@@ -195,6 +206,7 @@ func TestGetKeyStorePath(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if result != path {
 		t.Errorf("expected %s, got %s", path, result)
 	}
@@ -242,6 +254,7 @@ func TestHasKey_NoOptions(t *testing.T) {
 func TestWithStorePath_Priority(t *testing.T) {
 	// WithStorePath should take precedence over WithAppConfig
 	customPath := filepath.Join(t.TempDir(), "custom.key")
+
 	store, err := NewKeyStore(
 		WithAppConfig("myapp", "default.key"),
 		WithStorePath(customPath),
@@ -249,6 +262,7 @@ func TestWithStorePath_Priority(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if store.Path() != customPath {
 		t.Errorf("expected custom path %s, got %s", customPath, store.Path())
 	}
@@ -307,6 +321,7 @@ func TestFileKeyStore_ExistsEmptyPath(t *testing.T) {
 
 func TestFileKeyStore_DeleteEmptyPath(t *testing.T) {
 	store := &FileKeyStore{storePath: ""}
+
 	err := store.Delete()
 	if err != ErrKeyStoreNotInitialized {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
@@ -315,6 +330,7 @@ func TestFileKeyStore_DeleteEmptyPath(t *testing.T) {
 
 func TestFileKeyStore_SaveEmptyPath(t *testing.T) {
 	store := &FileKeyStore{storePath: ""}
+
 	err := store.Save(&SealedData{PublicArea: []byte("test")})
 	if err != ErrKeyStoreNotInitialized {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
@@ -323,6 +339,7 @@ func TestFileKeyStore_SaveEmptyPath(t *testing.T) {
 
 func TestFileKeyStore_LoadEmptyPath(t *testing.T) {
 	store := &FileKeyStore{storePath: ""}
+
 	_, err := store.Load()
 	if err != ErrKeyStoreNotInitialized {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
@@ -347,6 +364,7 @@ func containsHelper(s, substr string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

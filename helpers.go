@@ -49,6 +49,7 @@ func Initialize(opts ...KeyStoreOption) error {
 	if err != nil {
 		return fmt.Errorf("failed to create TPM key manager: %w", err)
 	}
+
 	defer func() { _ = km.Close() }()
 
 	// Generate and seal a new random key
@@ -140,6 +141,7 @@ func GetSealedMasterKey(opts ...KeyStoreOption) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create TPM key manager: %w", err)
 	}
+
 	defer func() { _ = km.Close() }()
 
 	sealedData, err := store.Load()

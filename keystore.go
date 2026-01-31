@@ -67,6 +67,7 @@ func getDefaultStorePath(appName, fileName string) string {
 		if configDir == "" {
 			configDir = os.Getenv("APPDATA")
 		}
+
 		configDir = filepath.Join(configDir, appName)
 
 	case "darwin":
@@ -74,6 +75,7 @@ func getDefaultStorePath(appName, fileName string) string {
 		if err != nil {
 			home = "."
 		}
+
 		configDir = filepath.Join(home, "Library", "Application Support", appName)
 
 	default: // linux and others
@@ -83,6 +85,7 @@ func getDefaultStorePath(appName, fileName string) string {
 			if err != nil {
 				home = "."
 			}
+
 			configDir = filepath.Join(home, ".config", appName)
 		} else {
 			configDir = filepath.Join(configDir, appName)
@@ -109,10 +112,8 @@ func (s *FileKeyStore) Save(data *SealedData) error {
 	}
 
 	// Set restrictive permissions on directory (platform-specific)
-	if err := setDirPermissions(dir); err != nil {
-		// Non-fatal: continue even if ACL setting fails
-		// The MkdirAll already set basic Unix permissions
-	}
+	// Non-fatal: continue even if ACL setting fails (MkdirAll already set basic Unix permissions)
+	_ = setDirPermissions(dir)
 
 	// Marshal the sealed data to JSON
 	jsonData, err := json.Marshal(data)
@@ -126,10 +127,8 @@ func (s *FileKeyStore) Save(data *SealedData) error {
 	}
 
 	// Set restrictive permissions on file (platform-specific)
-	if err := setFilePermissions(s.storePath); err != nil {
-		// Non-fatal: continue even if ACL setting fails
-		// The WriteFile already set basic Unix permissions
-	}
+	// Non-fatal: continue even if ACL setting fails (WriteFile already set basic Unix permissions)
+	_ = setFilePermissions(s.storePath)
 
 	return nil
 }
@@ -145,6 +144,7 @@ func (s *FileKeyStore) Load() (*SealedData, error) {
 		if os.IsNotExist(err) {
 			return nil, ErrNoSealedKey
 		}
+
 		return nil, fmt.Errorf("failed to read sealed key file: %w", err)
 	}
 
@@ -161,7 +161,9 @@ func (s *FileKeyStore) Exists() bool {
 	if s.storePath == "" {
 		return false
 	}
+
 	_, err := os.Stat(s.storePath)
+
 	return err == nil
 }
 

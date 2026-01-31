@@ -12,6 +12,7 @@ func TestMockKeyManager_SealKey_EmptyKey(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty key")
 	}
+
 	if !errors.Is(err, ErrKeyEmpty) {
 		t.Errorf("expected ErrKeyEmpty, got %v", err)
 	}
@@ -21,10 +22,12 @@ func TestMockKeyManager_SealKey_TooLarge(t *testing.T) {
 	km := NewMockKeyManager()
 
 	largeKey := make([]byte, maxSealableSize+1)
+
 	_, err := km.SealKey(largeKey)
 	if err == nil {
 		t.Fatal("expected error for oversized key")
 	}
+
 	if !errors.Is(err, ErrKeyTooLarge) {
 		t.Errorf("expected ErrKeyTooLarge, got %v", err)
 	}
@@ -42,6 +45,7 @@ func TestMockKeyManager_SealKey_MaxSize(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error for max size key: %v", err)
 	}
+
 	if sealed == nil {
 		t.Fatal("expected sealed data, got nil")
 	}
@@ -54,6 +58,7 @@ func TestMockKeyManager_UnsealKey_NilData(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for nil data")
 	}
+
 	if !errors.Is(err, ErrUnsealFailed) {
 		t.Errorf("expected ErrUnsealFailed, got %v", err)
 	}
@@ -72,6 +77,7 @@ func TestMockKeyManager_UnsealKey_EmptyPublicArea(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty public area")
 	}
+
 	if !errors.Is(err, ErrInvalidSealedData) {
 		t.Errorf("expected ErrInvalidSealedData, got %v", err)
 	}
@@ -90,6 +96,7 @@ func TestMockKeyManager_UnsealKey_EmptyPrivateArea(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty private area")
 	}
+
 	if !errors.Is(err, ErrInvalidSealedData) {
 		t.Errorf("expected ErrInvalidSealedData, got %v", err)
 	}
@@ -108,6 +115,7 @@ func TestMockKeyManager_UnsealKey_EmptySealedBlobPublic(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty sealed blob public")
 	}
+
 	if !errors.Is(err, ErrInvalidSealedData) {
 		t.Errorf("expected ErrInvalidSealedData, got %v", err)
 	}
@@ -169,6 +177,7 @@ func TestMockKeyManager_UnsealKey_UnknownData(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for unknown sealed data")
 	}
+
 	if !errors.Is(err, ErrUnsealFailed) {
 		t.Errorf("expected ErrUnsealFailed, got %v", err)
 	}
@@ -303,6 +312,7 @@ func TestMockKeyManager_MultipleKeys(t *testing.T) {
 	}
 
 	sealed := make([]*SealedData, len(keys))
+
 	var err error
 
 	// Seal all keys
@@ -319,6 +329,7 @@ func TestMockKeyManager_MultipleKeys(t *testing.T) {
 		if err != nil {
 			t.Fatalf("UnsealKey %d failed: %v", i, err)
 		}
+
 		if string(unsealed) != string(keys[i]) {
 			t.Errorf("key %d mismatch: got %q, want %q", i, unsealed, keys[i])
 		}

@@ -750,9 +750,10 @@ func TestParseSecureBootState(t *testing.T) {
 				if c.WellKnown == attestpb.WellKnownCertificate_UNKNOWN {
 					t.Error(("found WellKnownCertificate_UNKNOWN in db"))
 				}
-				if c.WellKnown == attestpb.WellKnownCertificate_MS_THIRD_PARTY_UEFI_CA_2011 {
+				switch c.WellKnown {
+				case attestpb.WellKnownCertificate_MS_THIRD_PARTY_UEFI_CA_2011:
 					contains3PUEFI = true
-				} else if c.WellKnown == attestpb.WellKnownCertificate_MS_WINDOWS_PROD_PCA_2011 {
+				case attestpb.WellKnownCertificate_MS_WINDOWS_PROD_PCA_2011:
 					containsWinProdPCA = true
 				}
 			}

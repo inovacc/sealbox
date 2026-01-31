@@ -163,12 +163,15 @@ func TestDefaultRetryConfig(t *testing.T) {
 	if cfg.MaxRetries != 3 {
 		t.Errorf("MaxRetries = %d, want 3", cfg.MaxRetries)
 	}
+
 	if cfg.InitialDelay != 10*time.Millisecond {
 		t.Errorf("InitialDelay = %v, want 10ms", cfg.InitialDelay)
 	}
+
 	if cfg.MaxDelay != 1*time.Second {
 		t.Errorf("MaxDelay = %v, want 1s", cfg.MaxDelay)
 	}
+
 	if cfg.BackoffFactor != 2.0 {
 		t.Errorf("BackoffFactor = %v, want 2.0", cfg.BackoffFactor)
 	}
@@ -179,17 +182,19 @@ func TestWithRetry_Success(t *testing.T) {
 	cfg.InitialDelay = 1 * time.Millisecond
 
 	callCount := 0
+
 	result, err := WithRetry(cfg, func() (string, error) {
 		callCount++
 		return "success", nil
 	})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
+
 	if result != "success" {
 		t.Errorf("result = %v, want 'success'", result)
 	}
+
 	if callCount != 1 {
 		t.Errorf("callCount = %d, want 1", callCount)
 	}
@@ -204,20 +209,23 @@ func TestWithRetry_RetryableError(t *testing.T) {
 	}
 
 	callCount := 0
+
 	result, err := WithRetry(cfg, func() (string, error) {
 		callCount++
 		if callCount < 3 {
 			return "", tpm2.TPMRCRetry
 		}
+
 		return "success", nil
 	})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
+
 	if result != "success" {
 		t.Errorf("result = %v, want 'success'", result)
 	}
+
 	if callCount != 3 {
 		t.Errorf("callCount = %d, want 3", callCount)
 	}
@@ -240,6 +248,7 @@ func TestWithRetry_NonRetryableError(t *testing.T) {
 	if !errors.Is(err, tpm2.TPMRCAuthFail) {
 		t.Errorf("expected TPM_RC_AUTH_FAIL error, got: %v", err)
 	}
+
 	if callCount != 1 {
 		t.Errorf("callCount = %d, want 1 (should not retry non-retryable errors)", callCount)
 	}
@@ -277,17 +286,19 @@ func TestWithRetryNoResult(t *testing.T) {
 	}
 
 	callCount := 0
+
 	err := WithRetryNoResult(cfg, func() error {
 		callCount++
 		if callCount < 2 {
 			return tpm2.TPMRCMemory
 		}
+
 		return nil
 	})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
+
 	if callCount != 2 {
 		t.Errorf("callCount = %d, want 2", callCount)
 	}

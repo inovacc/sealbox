@@ -39,6 +39,7 @@ func (p *policyHelper) computePCRDigest(hash tpm2.TPMIAlgHash, pcrs ...uint) ([]
 	pcrRead := tpm2.PCRRead{
 		PCRSelectionIn: selection,
 	}
+
 	pcrResp, err := pcrRead.Execute(p.tpm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read PCRs: %w", err)
@@ -55,6 +56,7 @@ func (p *policyHelper) computePCRDigest(hash tpm2.TPMIAlgHash, pcrs ...uint) ([]
 	if err != nil {
 		return nil, fmt.Errorf("invalid hash algorithm: %w", err)
 	}
+
 	h := hashAlg.New()
 	h.Write(pcrValues)
 
@@ -79,6 +81,7 @@ func (p *policyHelper) readPCRValues(hash tpm2.TPMIAlgHash, pcrs ...uint) ([][]b
 	pcrRead := tpm2.PCRRead{
 		PCRSelectionIn: selection,
 	}
+
 	pcrResp, err := pcrRead.Execute(p.tpm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read PCRs: %w", err)
@@ -101,6 +104,7 @@ func (p *policyHelper) computeTrialPolicyDigest(cfg *sealConfig) ([]byte, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create trial session: %w", err)
 	}
+
 	defer func() { _ = cleanup() }()
 
 	// Execute policy commands
@@ -112,6 +116,7 @@ func (p *policyHelper) computeTrialPolicyDigest(cfg *sealConfig) ([]byte, error)
 	pgd := tpm2.PolicyGetDigest{
 		PolicySession: sess.Handle(),
 	}
+
 	pgdResp, err := pgd.Execute(p.tpm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get policy digest: %w", err)
@@ -128,6 +133,7 @@ func (p *policyHelper) executePolicyCommands(sessHandle tpm2.TPMHandle, cfg *sea
 		if pcrDigest == nil {
 			// Compute current PCR digest
 			var err error
+
 			pcrDigest, err = p.computePCRDigest(cfg.pcrSelection.Hash, cfg.pcrSelection.PCRs...)
 			if err != nil {
 				return fmt.Errorf("failed to compute PCR digest: %w", err)
@@ -192,6 +198,7 @@ func buildSealedPCRSelection(sel *PCRSelection, digest []byte) *SealedPCRSelecti
 	if sel == nil {
 		return nil
 	}
+
 	return &SealedPCRSelection{
 		HashAlg: uint16(sel.Hash),
 		PCRs:    sel.PCRs,

@@ -16,7 +16,7 @@ func SecureZero(b []byte) {
 	// Use volatile-like access pattern to prevent compiler optimization
 	ptr := unsafe.Pointer(&b[0])
 	for i := range b {
-		*(*byte)(unsafe.Pointer(uintptr(ptr) + uintptr(i))) = 0
+		*(*byte)(unsafe.Add(ptr, i)) = 0
 	}
 }
 
@@ -55,8 +55,10 @@ func CopyAndZero(src []byte) []byte {
 	if len(src) == 0 {
 		return nil
 	}
+
 	dst := make([]byte, len(src))
 	copy(dst, src)
 	SecureZero(src)
+
 	return dst
 }

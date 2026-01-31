@@ -14,9 +14,11 @@ func TestNewKeyHierarchy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewKeyHierarchy() error = %v", err)
 	}
+
 	if h == nil {
 		t.Fatal("NewKeyHierarchy() returned nil")
 	}
+
 	if h.Count() != 0 {
 		t.Errorf("Count() = %d, want 0", h.Count())
 	}
@@ -48,9 +50,11 @@ func TestKeyHierarchy_AddAndGet(t *testing.T) {
 	if !exists {
 		t.Error("Get() returned exists = false, want true")
 	}
+
 	if got == nil {
 		t.Fatal("Get() returned nil")
 	}
+
 	if string(got.PublicArea) != "pub" {
 		t.Errorf("PublicArea = %s, want 'pub'", got.PublicArea)
 	}
@@ -63,6 +67,7 @@ func TestKeyHierarchy_AddDuplicate(t *testing.T) {
 	sealed := &SealedData{PublicArea: []byte("pub"), PrivateArea: []byte("priv"), SealedBlobPublic: []byte("sealed")}
 
 	_ = h.Add("key", sealed)
+
 	err := h.Add("key", sealed)
 	if err == nil {
 		t.Error("Add() duplicate key should return error")
@@ -135,6 +140,7 @@ func TestKeyHierarchy_List(t *testing.T) {
 	if len(names) != len(expected) {
 		t.Fatalf("List() returned %d names, want %d", len(names), len(expected))
 	}
+
 	for i, name := range names {
 		if name != expected[i] {
 			t.Errorf("List()[%d] = %s, want %s", i, name, expected[i])
@@ -152,6 +158,7 @@ func TestKeyHierarchy_Exists(t *testing.T) {
 	if !h.Exists("key") {
 		t.Error("Exists() returned false, want true")
 	}
+
 	if h.Exists("non-existent") {
 		t.Error("Exists() returned true for non-existent key")
 	}
@@ -170,6 +177,7 @@ func TestKeyHierarchy_Clear(t *testing.T) {
 	if h.Count() != 0 {
 		t.Errorf("Count() after Clear() = %d, want 0", h.Count())
 	}
+
 	if !h.IsModified() {
 		t.Error("IsModified() after Clear() should be true")
 	}
@@ -186,6 +194,7 @@ func TestKeyHierarchy_SaveAndLoad(t *testing.T) {
 		PrivateArea:      []byte("priv-area"),
 		SealedBlobPublic: []byte("sealed-pub"),
 	}
+
 	_ = h1.Add("key1", sealed)
 	if err := h1.Save(); err != nil {
 		t.Fatalf("Save() error = %v", err)
@@ -201,6 +210,7 @@ func TestKeyHierarchy_SaveAndLoad(t *testing.T) {
 	if !exists {
 		t.Fatal("Get() after load should find key")
 	}
+
 	if string(got.PublicArea) != "pub-area" {
 		t.Errorf("PublicArea = %s, want 'pub-area'", got.PublicArea)
 	}
@@ -242,6 +252,7 @@ func TestKeyHierarchy_IsModified(t *testing.T) {
 
 	// Add key marks as modified
 	sealed := &SealedData{PublicArea: []byte("pub"), PrivateArea: []byte("priv"), SealedBlobPublic: []byte("sealed")}
+
 	_ = h.Add("key", sealed)
 	if !h.IsModified() {
 		t.Error("After Add() should be modified")
@@ -255,6 +266,7 @@ func TestKeyHierarchy_IsModified(t *testing.T) {
 
 	// Remove marks as modified
 	h.Remove("key")
+
 	if !h.IsModified() {
 		t.Error("After Remove() should be modified")
 	}
@@ -265,7 +277,8 @@ func TestKeyHierarchyManager_GenerateAndUnsealKey(t *testing.T) {
 
 	// Use mock key manager
 	km := NewMockKeyManager()
-	defer km.Close()
+
+	defer func() { _ = km.Close() }()
 
 	mgr, err := NewKeyHierarchyManager(km, tmpDir)
 	if err != nil {
@@ -288,6 +301,7 @@ func TestKeyHierarchyManager_GenerateAndUnsealKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UnsealKey() error = %v", err)
 	}
+
 	if len(key) != 32 {
 		t.Errorf("Key length = %d, want 32", len(key))
 	}
@@ -297,11 +311,13 @@ func TestKeyHierarchyManager_SealKey(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	km := NewMockKeyManager()
-	defer km.Close()
+
+	defer func() { _ = km.Close() }()
 
 	mgr, _ := NewKeyHierarchyManager(km, tmpDir)
 
 	originalKey := []byte("my-secret-key-12345678901234567")
+
 	err := mgr.SealKey("my-key", originalKey)
 	if err != nil {
 		t.Fatalf("SealKey() error = %v", err)
@@ -312,6 +328,7 @@ func TestKeyHierarchyManager_SealKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UnsealKey() error = %v", err)
 	}
+
 	if string(unsealed) != string(originalKey) {
 		t.Errorf("Unsealed key = %s, want %s", unsealed, originalKey)
 	}
@@ -321,7 +338,8 @@ func TestKeyHierarchyManager_UnsealKeyNotFound(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	km := NewMockKeyManager()
-	defer km.Close()
+
+	defer func() { _ = km.Close() }()
 
 	mgr, _ := NewKeyHierarchyManager(km, tmpDir)
 
@@ -339,6 +357,7 @@ func TestKeyHierarchyManager_Close(t *testing.T) {
 
 	// Generate key and close with save
 	_ = mgr.GenerateKey("key")
+
 	err := mgr.Close(true)
 	if err != nil {
 		t.Fatalf("Close(true) error = %v", err)
@@ -359,6 +378,7 @@ func TestKeyHierarchyManager_CloseNoSave(t *testing.T) {
 
 	// Generate key and close without save
 	_ = mgr.GenerateKey("key")
+
 	err := mgr.Close(false)
 	if err != nil {
 		t.Fatalf("Close(false) error = %v", err)
@@ -375,12 +395,13 @@ func TestKeyHierarchyManager_MultipleKeys(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	km := NewMockKeyManager()
-	defer km.Close()
+
+	defer func() { _ = km.Close() }()
 
 	mgr, _ := NewKeyHierarchyManager(km, tmpDir)
 
 	// Generate multiple keys
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		name := "key-" + string(rune('a'+i))
 		if err := mgr.GenerateKey(name); err != nil {
 			t.Fatalf("GenerateKey(%s) error = %v", name, err)
@@ -393,12 +414,14 @@ func TestKeyHierarchyManager_MultipleKeys(t *testing.T) {
 	}
 
 	// Unseal each key
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		name := "key-" + string(rune('a'+i))
+
 		key, err := mgr.UnsealKey(name)
 		if err != nil {
 			t.Errorf("UnsealKey(%s) error = %v", name, err)
 		}
+
 		if len(key) != 32 {
 			t.Errorf("Key %s length = %d, want 32", name, len(key))
 		}

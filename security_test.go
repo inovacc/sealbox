@@ -20,6 +20,7 @@ func TestSecureZero(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			SecureZero(tc.input)
+
 			for i, b := range tc.input {
 				if b != 0 {
 					t.Errorf("SecureZero: byte at index %d is %d, want 0", i, b)
@@ -35,12 +36,13 @@ func TestWithKeyCleanup(t *testing.T) {
 	copy(keyCopy, key)
 
 	var receivedKey []byte
+
 	err := WithKeyCleanup(key, func(k []byte) error {
 		receivedKey = make([]byte, len(k))
 		copy(receivedKey, k)
+
 		return nil
 	})
-
 	if err != nil {
 		t.Fatalf("WithKeyCleanup returned error: %v", err)
 	}

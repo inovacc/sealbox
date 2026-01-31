@@ -103,8 +103,11 @@ func IsPCRError(err error) bool {
 // The function will be retried up to MaxRetries times if it returns a retryable error.
 // Non-retryable errors (like authentication failures) are returned immediately.
 func WithRetry[T any](cfg RetryConfig, fn func() (T, error)) (T, error) {
-	var result T
-	var lastErr error
+	var (
+		result  T
+		lastErr error
+	)
+
 	delay := cfg.InitialDelay
 
 	for attempt := 0; attempt <= cfg.MaxRetries; attempt++ {
@@ -121,10 +124,8 @@ func WithRetry[T any](cfg RetryConfig, fn func() (T, error)) (T, error) {
 		// Don't sleep on the last attempt
 		if attempt < cfg.MaxRetries {
 			time.Sleep(delay)
-			delay = time.Duration(float64(delay) * cfg.BackoffFactor)
-			if delay > cfg.MaxDelay {
-				delay = cfg.MaxDelay
-			}
+
+			delay = min(time.Duration(float64(delay)*cfg.BackoffFactor), cfg.MaxDelay)
 		}
 	}
 
@@ -137,5 +138,6 @@ func WithRetryNoResult(cfg RetryConfig, fn func() error) error {
 	_, err := WithRetry(cfg, func() (struct{}, error) {
 		return struct{}{}, fn()
 	})
+
 	return err
 }

@@ -66,6 +66,7 @@ func TestInitializeWith_GenerateError(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
+
 	if !errors.Is(err, customErr) {
 		t.Errorf("expected wrapped custom error, got %v", err)
 	}
@@ -145,6 +146,7 @@ func TestHasKey_WithMock(t *testing.T) {
 
 	// Create a key using mock
 	km := NewMockKeyManager()
+
 	err := InitializeWith(km, WithStorePath(storePath))
 	if err != nil {
 		t.Fatalf("InitializeWith failed: %v", err)

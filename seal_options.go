@@ -73,6 +73,7 @@ func applySealOptions(opts ...SealOption) *sealConfig {
 	for _, opt := range opts {
 		opt(cfg)
 	}
+
 	return cfg
 }
 

@@ -29,6 +29,7 @@ func (m *baseKeyManager) Close() error {
 	if m.tpm != nil {
 		return m.tpm.Close()
 	}
+
 	return nil
 }
 
@@ -77,6 +78,7 @@ func (m *baseKeyManager) SealKey(key []byte) (*SealedData, error) {
 	if len(key) == 0 {
 		return nil, ErrKeyEmpty
 	}
+
 	if len(key) > maxSealableSize {
 		return nil, fmt.Errorf("%w: got %d bytes", ErrKeyTooLarge, len(key))
 	}
@@ -142,6 +144,7 @@ func (m *baseKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
 	if data == nil {
 		return nil, fmt.Errorf("%w: sealed data cannot be nil", ErrUnsealFailed)
 	}
+
 	if len(data.PublicArea) == 0 || len(data.PrivateArea) == 0 || len(data.SealedBlobPublic) == 0 {
 		return nil, ErrInvalidSealedData
 	}
@@ -222,6 +225,7 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 	if len(key) == 0 {
 		return nil, ErrKeyEmpty
 	}
+
 	if len(key) > maxSealableSize {
 		return nil, fmt.Errorf("%w: got %d bytes", ErrKeyTooLarge, len(key))
 	}
@@ -237,6 +241,7 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to create primary key: %v", ErrSealFailed, err)
 	}
+
 	defer func() {
 		fc := tpm2.FlushContext{FlushHandle: primaryResp.ObjectHandle}
 		_, _ = fc.Execute(m.tpm)
@@ -252,6 +257,7 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 
 	// Compute PCR digest if using PCR binding
 	var pcrDigest []byte
+
 	if cfg.pcrSelection != nil {
 		if cfg.pcrSelection.Digest != nil {
 			pcrDigest = cfg.pcrSelection.Digest
@@ -326,6 +332,7 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	if data == nil {
 		return nil, fmt.Errorf("%w: sealed data cannot be nil", ErrUnsealFailed)
 	}
+
 	if len(data.PublicArea) == 0 || len(data.PrivateArea) == 0 || len(data.SealedBlobPublic) == 0 {
 		return nil, ErrInvalidSealedData
 	}
@@ -355,6 +362,7 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to create primary key: %v", ErrUnsealFailed, err)
 	}
+
 	defer func() {
 		fc := tpm2.FlushContext{FlushHandle: primaryResp.ObjectHandle}
 		_, _ = fc.Execute(m.tpm)
@@ -384,6 +392,7 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to load sealed object: %v", ErrUnsealFailed, err)
 	}
+
 	defer func() {
 		fc := tpm2.FlushContext{FlushHandle: loadResp.ObjectHandle}
 		_, _ = fc.Execute(m.tpm)
@@ -391,14 +400,17 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 
 	// Create policy session for unsealing
 	ph := newPolicyHelper(m.tpm)
+
 	sess, cleanup, err := ph.createPolicySession(cfg)
 	if err != nil {
 		// Check for specific policy failures
 		if data.PCRSelection != nil {
 			return nil, fmt.Errorf("%w: %v", ErrPCRMismatch, err)
 		}
+
 		return nil, fmt.Errorf("%w: %v", ErrPolicyFailed, err)
 	}
+
 	defer func() { _ = cleanup() }()
 
 	unseal := tpm2.Unseal{
@@ -415,9 +427,11 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 		if data.HasPassword {
 			return nil, fmt.Errorf("%w: %v", ErrInvalidPassword, err)
 		}
+
 		if data.PCRSelection != nil {
 			return nil, fmt.Errorf("%w: %v", ErrPCRMismatch, err)
 		}
+
 		return nil, fmt.Errorf("%w: failed to unseal data: %v", ErrUnsealFailed, err)
 	}
 
@@ -442,5 +456,6 @@ func (m *baseKeyManager) ReadPCRs(hash uint16, pcrs ...uint) ([][]byte, error) {
 	}
 
 	ph := newPolicyHelper(m.tpm)
+
 	return ph.readPCRValues(tpm2.TPMIAlgHash(hash), pcrs...)
 }

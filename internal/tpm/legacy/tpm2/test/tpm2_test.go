@@ -570,8 +570,8 @@ func TestLoadExternalPublicKey(t *testing.T) {
 					Hash: AlgSHA1,
 				},
 				KeyBits:     2048,
-				ExponentRaw: uint32(pk.PublicKey.E),
-				ModulusRaw:  pk.PublicKey.N.Bytes(),
+				ExponentRaw: uint32(pk.E),
+				ModulusRaw:  pk.N.Bytes(),
 			},
 		}
 		private := Private{
@@ -596,7 +596,7 @@ func TestLoadExternalPublicKey(t *testing.T) {
 					Hash: AlgSHA1,
 				},
 				CurveID: CurveNISTP256,
-				Point:   ECPoint{XRaw: pk.PublicKey.X.Bytes(), YRaw: pk.PublicKey.Y.Bytes()},
+				Point:   ECPoint{XRaw: pk.X.Bytes(), YRaw: pk.Y.Bytes()},
 			},
 		}
 		private := Private{
@@ -797,8 +797,8 @@ func TestCertifyExternalKey(t *testing.T) {
 					Hash: AlgSHA1,
 				},
 				KeyBits:     2048,
-				ExponentRaw: uint32(pk.PublicKey.E),
-				ModulusRaw:  pk.PublicKey.N.Bytes(),
+				ExponentRaw: uint32(pk.E),
+				ModulusRaw:  pk.N.Bytes(),
 			},
 		}
 		private := Private{
@@ -823,7 +823,7 @@ func TestCertifyExternalKey(t *testing.T) {
 					Hash: AlgSHA1,
 				},
 				CurveID: CurveNISTP256,
-				Point:   ECPoint{XRaw: pk.PublicKey.X.Bytes(), YRaw: pk.PublicKey.Y.Bytes()},
+				Point:   ECPoint{XRaw: pk.X.Bytes(), YRaw: pk.Y.Bytes()},
 			},
 		}
 		private := Private{
@@ -1755,8 +1755,8 @@ func TestReadPublicKey(t *testing.T) {
 					Hash: AlgSHA1,
 				},
 				KeyBits:     2048,
-				ExponentRaw: uint32(pk.PublicKey.E),
-				ModulusRaw:  pk.PublicKey.N.Bytes(),
+				ExponentRaw: uint32(pk.E),
+				ModulusRaw:  pk.N.Bytes(),
 			},
 		}
 		private := Private{
@@ -1781,7 +1781,7 @@ func TestReadPublicKey(t *testing.T) {
 					Hash: AlgSHA1,
 				},
 				CurveID: CurveNISTP256,
-				Point:   ECPoint{XRaw: pk.PublicKey.X.Bytes(), YRaw: pk.PublicKey.Y.Bytes()},
+				Point:   ECPoint{XRaw: pk.X.Bytes(), YRaw: pk.Y.Bytes()},
 			},
 		}
 		private := Private{

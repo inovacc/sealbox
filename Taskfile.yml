@@ -83,12 +83,21 @@ tasks:
   vet:
     desc: Run go vet static analysis
     cmds:
-      - go vet ./...
+      - go vet .
 
   lint:
     desc: Run linter and auto-fix issues
+    env:
+      CGO_ENABLED: "0"
     cmds:
-      - golangci-lint run --fix ./... --timeout=5m
+      - golangci-lint run --fix . --timeout=5m
+
+  lint:fix:
+    desc: Run linter and auto-fix issues
+    env:
+      CGO_ENABLED: "0"
+    cmds:
+      - golangci-lint run --fix . --timeout=5m
 
   check:
     desc: Run all quality checks (fmt, vet, lint, test)

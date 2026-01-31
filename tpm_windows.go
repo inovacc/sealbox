@@ -21,6 +21,7 @@ func IsAvailable() bool {
 	}
 
 	_ = tpmConn.Close()
+
 	return true
 }
 

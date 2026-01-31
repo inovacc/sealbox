@@ -72,6 +72,7 @@ func (m *MockKeyManager) SealKey(key []byte) (*SealedData, error) {
 	if len(key) == 0 {
 		return nil, ErrKeyEmpty
 	}
+
 	if len(key) > maxSealableSize {
 		return nil, ErrKeyTooLarge
 	}
@@ -87,9 +88,11 @@ func (m *MockKeyManager) SealKey(key []byte) (*SealedData, error) {
 	if _, err := io.ReadFull(rand.Reader, publicArea); err != nil {
 		return nil, err
 	}
+
 	if _, err := io.ReadFull(rand.Reader, privateArea); err != nil {
 		return nil, err
 	}
+
 	if _, err := io.ReadFull(rand.Reader, sealedBlobPublic); err != nil {
 		return nil, err
 	}
@@ -119,6 +122,7 @@ func (m *MockKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
 	if data == nil {
 		return nil, ErrUnsealFailed
 	}
+
 	if len(data.PublicArea) == 0 || len(data.PrivateArea) == 0 || len(data.SealedBlobPublic) == 0 {
 		return nil, ErrInvalidSealedData
 	}
@@ -127,6 +131,7 @@ func (m *MockKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
 	defer m.mu.Unlock()
 
 	hash := m.hashSealedData(data)
+
 	entry, ok := m.sealedKeys[hash]
 	if !ok {
 		return nil, ErrUnsealFailed
@@ -155,6 +160,7 @@ func (m *MockKeyManager) Close() error {
 	if m.CloseFunc != nil {
 		return m.CloseFunc()
 	}
+
 	return nil
 }
 
@@ -164,6 +170,7 @@ func (m *MockKeyManager) hashSealedData(data *SealedData) string {
 	h.Write(data.PublicArea)
 	h.Write(data.PrivateArea)
 	h.Write(data.SealedBlobPublic)
+
 	return string(h.Sum(nil))
 }
 
@@ -171,6 +178,7 @@ func (m *MockKeyManager) hashSealedData(data *SealedData) string {
 func (m *MockKeyManager) Reset() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	m.sealedKeys = make(map[string]*mockSealedEntry)
 	m.mockPCRs = make(map[uint][]byte)
 }
@@ -179,6 +187,7 @@ func (m *MockKeyManager) Reset() {
 func (m *MockKeyManager) SetMockPCR(index uint, value []byte) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	m.mockPCRs[index] = append([]byte(nil), value...)
 }
 
@@ -192,6 +201,7 @@ func (m *MockKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 	if len(key) == 0 {
 		return nil, ErrKeyEmpty
 	}
+
 	if len(key) > maxSealableSize {
 		return nil, ErrKeyTooLarge
 	}
@@ -209,22 +219,28 @@ func (m *MockKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 	if _, err := io.ReadFull(rand.Reader, publicArea); err != nil {
 		return nil, err
 	}
+
 	if _, err := io.ReadFull(rand.Reader, privateArea); err != nil {
 		return nil, err
 	}
+
 	if _, err := io.ReadFull(rand.Reader, sealedBlobPublic); err != nil {
 		return nil, err
 	}
 
 	// Compute mock PCR digest if PCRs are selected
-	var pcrDigest []byte
-	var pcrSelection *SealedPCRSelection
+	var (
+		pcrDigest    []byte
+		pcrSelection *SealedPCRSelection
+	)
+
 	if cfg.pcrSelection != nil {
 		if cfg.pcrSelection.Digest != nil {
 			pcrDigest = cfg.pcrSelection.Digest
 		} else {
 			// Compute from mock PCRs
 			h := sha256.New()
+
 			for _, pcr := range cfg.pcrSelection.PCRs {
 				if val, ok := m.mockPCRs[pcr]; ok {
 					h.Write(val)
@@ -233,8 +249,10 @@ func (m *MockKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 					h.Write(make([]byte, 32))
 				}
 			}
+
 			pcrDigest = h.Sum(nil)
 		}
+
 		pcrSelection = &SealedPCRSelection{
 			HashAlg: uint16(cfg.pcrSelection.Hash),
 			PCRs:    cfg.pcrSelection.PCRs,
@@ -244,14 +262,17 @@ func (m *MockKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 
 	// Compute mock policy digest
 	var policyDigest []byte
+
 	if cfg.hasPolicy() {
 		h := sha256.New()
 		if pcrDigest != nil {
 			h.Write(pcrDigest)
 		}
+
 		if len(cfg.password) > 0 {
 			h.Write(cfg.password)
 		}
+
 		policyDigest = h.Sum(nil)
 	}
 
@@ -288,6 +309,7 @@ func (m *MockKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	if data == nil {
 		return nil, ErrUnsealFailed
 	}
+
 	if len(data.PublicArea) == 0 || len(data.PrivateArea) == 0 || len(data.SealedBlobPublic) == 0 {
 		return nil, ErrInvalidSealedData
 	}
@@ -298,6 +320,7 @@ func (m *MockKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	defer m.mu.Unlock()
 
 	hash := m.hashSealedData(data)
+
 	entry, ok := m.sealedKeys[hash]
 	if !ok {
 		return nil, ErrUnsealFailed
@@ -308,6 +331,7 @@ func (m *MockKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 		if len(cfg.password) == 0 {
 			return nil, ErrPasswordRequired
 		}
+
 		if !bytes.Equal(cfg.password, entry.password) {
 			return nil, ErrInvalidPassword
 		}
@@ -317,6 +341,7 @@ func (m *MockKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	if entry.hasPCR && data.PCRSelection != nil {
 		// Compute current mock PCR digest
 		h := sha256.New()
+
 		for _, pcr := range data.PCRSelection.PCRs {
 			if val, ok := m.mockPCRs[pcr]; ok {
 				h.Write(val)
@@ -324,6 +349,7 @@ func (m *MockKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 				h.Write(make([]byte, 32))
 			}
 		}
+
 		currentDigest := h.Sum(nil)
 
 		if !bytes.Equal(currentDigest, entry.pcrDigest) {

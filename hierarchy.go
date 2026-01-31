@@ -68,6 +68,7 @@ func (h *KeyHierarchy) load() error {
 	if h.keys == nil {
 		h.keys = make(map[string]*SealedData)
 	}
+
 	h.modified = false
 
 	return nil
@@ -102,11 +103,13 @@ func (h *KeyHierarchy) Save() error {
 	if err := setFilePermissions(filePath); err != nil {
 		return fmt.Errorf("failed to set file permissions: %w", err)
 	}
+
 	if err := setDirPermissions(h.basePath); err != nil {
 		return fmt.Errorf("failed to set directory permissions: %w", err)
 	}
 
 	h.modified = false
+
 	return nil
 }
 
@@ -119,15 +122,18 @@ func (h *KeyHierarchy) Add(name string, data *SealedData) error {
 	if name == "" {
 		return fmt.Errorf("key name cannot be empty")
 	}
+
 	if data == nil {
 		return fmt.Errorf("sealed data cannot be nil")
 	}
+
 	if _, exists := h.keys[name]; exists {
 		return fmt.Errorf("key '%s' already exists in hierarchy", name)
 	}
 
 	h.keys[name] = data
 	h.modified = true
+
 	return nil
 }
 
@@ -137,6 +143,7 @@ func (h *KeyHierarchy) Get(name string) (*SealedData, bool) {
 	defer h.mu.RUnlock()
 
 	data, exists := h.keys[name]
+
 	return data, exists
 }
 
@@ -152,6 +159,7 @@ func (h *KeyHierarchy) Remove(name string) bool {
 
 	delete(h.keys, name)
 	h.modified = true
+
 	return true
 }
 
@@ -164,6 +172,7 @@ func (h *KeyHierarchy) List() []string {
 	for name := range h.keys {
 		names = append(names, name)
 	}
+
 	return names
 }
 
@@ -181,6 +190,7 @@ func (h *KeyHierarchy) Exists(name string) bool {
 	defer h.mu.RUnlock()
 
 	_, exists := h.keys[name]
+
 	return exists
 }
 
@@ -213,6 +223,7 @@ func (h *KeyHierarchy) Delete() error {
 
 	h.keys = make(map[string]*SealedData)
 	h.modified = false
+
 	return nil
 }
 
@@ -341,5 +352,6 @@ func (m *KeyHierarchyManager) Close(save bool) error {
 			return err
 		}
 	}
+
 	return m.km.Close()
 }

@@ -54,6 +54,7 @@ func (s *SealedData) GetVersion() int {
 	if s.Version < SealedDataV2 {
 		return SealedDataV1
 	}
+
 	return s.Version
 }
 

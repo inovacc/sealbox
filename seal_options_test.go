@@ -25,12 +25,15 @@ func TestWithPCRs(t *testing.T) {
 	if cfg.pcrSelection == nil {
 		t.Fatal("WithPCRs: pcrSelection is nil")
 	}
+
 	if cfg.pcrSelection.Hash != tpm2.TPMAlgSHA256 {
 		t.Errorf("WithPCRs: Hash got %v, want %v", cfg.pcrSelection.Hash, tpm2.TPMAlgSHA256)
 	}
+
 	if len(cfg.pcrSelection.PCRs) != 3 {
 		t.Errorf("WithPCRs: len(PCRs) got %d, want 3", len(cfg.pcrSelection.PCRs))
 	}
+
 	if cfg.pcrSelection.Digest != nil {
 		t.Error("WithPCRs: Digest should be nil")
 	}
@@ -45,9 +48,11 @@ func TestWithPCRDigest(t *testing.T) {
 	if cfg.pcrSelection == nil {
 		t.Fatal("WithPCRDigest: pcrSelection is nil")
 	}
+
 	if string(cfg.pcrSelection.Digest) != string(digest) {
 		t.Errorf("WithPCRDigest: Digest got %v, want %v", cfg.pcrSelection.Digest, digest)
 	}
+
 	if len(cfg.pcrSelection.PCRs) != 2 {
 		t.Errorf("WithPCRDigest: len(PCRs) got %d, want 2", len(cfg.pcrSelection.PCRs))
 	}
@@ -74,9 +79,11 @@ func TestApplySealOptions(t *testing.T) {
 	if string(cfg.password) != string(password) {
 		t.Errorf("applySealOptions: password mismatch")
 	}
+
 	if cfg.pcrSelection == nil {
 		t.Error("applySealOptions: pcrSelection is nil")
 	}
+
 	if !cfg.sessionEncrypt {
 		t.Error("applySealOptions: sessionEncrypt should be true")
 	}

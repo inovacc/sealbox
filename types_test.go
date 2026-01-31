@@ -122,9 +122,11 @@ func TestSealedPCRSelection(t *testing.T) {
 	if sel.HashAlg != 0x000B {
 		t.Errorf("HashAlg = %x, want 0x000B", sel.HashAlg)
 	}
+
 	if len(sel.PCRs) != 3 {
 		t.Errorf("len(PCRs) = %d, want 3", len(sel.PCRs))
 	}
+
 	if len(sel.Digest) != 3 {
 		t.Errorf("len(Digest) = %d, want 3", len(sel.Digest))
 	}
