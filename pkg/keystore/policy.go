@@ -5,9 +5,8 @@ package keystore
 import (
 	"fmt"
 
-	"github.com/google/go-tpm/tpm/tpm2/transport"
 	"github.com/google/go-tpm/tpm2"
-	tpm3 "github.com/inovacc/keystore/pkg/keystore/internal/tpm/tpm2"
+	"github.com/google/go-tpm/tpm2/transport"
 )
 
 // policyHelper provides utilities for computing and executing TPM policies.
@@ -31,13 +30,13 @@ func (p *policyHelper) computePCRDigest(hash tpm2.TPMIAlgHash, pcrs ...uint) ([]
 		PCRSelections: []tpm2.TPMSPCRSelection{
 			{
 				Hash:      hash,
-				PCRSelect: tpm3.PCClientCompatible.PCRs(pcrs...),
+				PCRSelect: tpm2.PCClientCompatible.PCRs(pcrs...),
 			},
 		},
 	}
 
 	// Read PCR values
-	pcrRead := tpm3.PCRRead{
+	pcrRead := tpm2.PCRRead{
 		PCRSelectionIn: selection,
 	}
 
@@ -74,12 +73,12 @@ func (p *policyHelper) readPCRValues(hash tpm2.TPMIAlgHash, pcrs ...uint) ([][]b
 		PCRSelections: []tpm2.TPMSPCRSelection{
 			{
 				Hash:      hash,
-				PCRSelect: tpm3.PCClientCompatible.PCRs(pcrs...),
+				PCRSelect: tpm2.PCClientCompatible.PCRs(pcrs...),
 			},
 		},
 	}
 
-	pcrRead := tpm3.PCRRead{
+	pcrRead := tpm2.PCRRead{
 		PCRSelectionIn: selection,
 	}
 
@@ -101,7 +100,7 @@ func (p *policyHelper) readPCRValues(hash tpm2.TPMIAlgHash, pcrs ...uint) ([][]b
 // This allows computing the policy digest without actually creating a sealed object.
 func (p *policyHelper) computeTrialPolicyDigest(cfg *sealConfig) ([]byte, error) {
 	// Create a trial policy session
-	sess, cleanup, err := tpm3.PolicySession(p.tpm, tpm2.TPMAlgSHA256, 16, tpm3.Trial())
+	sess, cleanup, err := tpm2.PolicySession(p.tpm, tpm2.TPMAlgSHA256, 16, tpm2.Trial())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create trial session: %w", err)
 	}
@@ -114,7 +113,7 @@ func (p *policyHelper) computeTrialPolicyDigest(cfg *sealConfig) ([]byte, error)
 	}
 
 	// Get the policy digest
-	pgd := tpm3.PolicyGetDigest{
+	pgd := tpm2.PolicyGetDigest{
 		PolicySession: sess.Handle(),
 	}
 
@@ -141,7 +140,7 @@ func (p *policyHelper) executePolicyCommands(sessHandle tpm2.TPMHandle, cfg *sea
 			}
 		}
 
-		policyPCR := tpm3.PolicyPCR{
+		policyPCR := tpm2.PolicyPCR{
 			PolicySession: sessHandle,
 			PcrDigest: tpm2.TPM2BDigest{
 				Buffer: pcrDigest,
@@ -150,7 +149,7 @@ func (p *policyHelper) executePolicyCommands(sessHandle tpm2.TPMHandle, cfg *sea
 				PCRSelections: []tpm2.TPMSPCRSelection{
 					{
 						Hash:      cfg.pcrSelection.Hash,
-						PCRSelect: tpm3.PCClientCompatible.PCRs(cfg.pcrSelection.PCRs...),
+						PCRSelect: tpm2.PCClientCompatible.PCRs(cfg.pcrSelection.PCRs...),
 					},
 				},
 			},
@@ -162,7 +161,7 @@ func (p *policyHelper) executePolicyCommands(sessHandle tpm2.TPMHandle, cfg *sea
 
 	// Password/AuthValue policy (if configured)
 	if len(cfg.password) > 0 {
-		policyAuthValue := tpm3.PolicyAuthValue{
+		policyAuthValue := tpm2.PolicyAuthValue{
 			PolicySession: sessHandle,
 		}
 		if _, err := policyAuthValue.Execute(p.tpm); err != nil {
@@ -174,13 +173,13 @@ func (p *policyHelper) executePolicyCommands(sessHandle tpm2.TPMHandle, cfg *sea
 }
 
 // createPolicySession creates a policy session for unsealing.
-func (p *policyHelper) createPolicySession(cfg *sealConfig) (tpm3.Session, func() error, error) {
-	var opts []tpm3.AuthOption
+func (p *policyHelper) createPolicySession(cfg *sealConfig) (tpm2.Session, func() error, error) {
+	var opts []tpm2.AuthOption
 	if len(cfg.password) > 0 {
-		opts = append(opts, tpm3.Auth(cfg.password))
+		opts = append(opts, tpm2.Auth(cfg.password))
 	}
 
-	sess, cleanup, err := tpm3.PolicySession(p.tpm, tpm2.TPMAlgSHA256, 16, opts...)
+	sess, cleanup, err := tpm2.PolicySession(p.tpm, tpm2.TPMAlgSHA256, 16, opts...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create policy session: %w", err)
 	}

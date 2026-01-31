@@ -31,7 +31,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/inovacc/keystore"
+	"github.com/inovacc/keystore/pkg/keystore"
 )
 
 const (

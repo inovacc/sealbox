@@ -8,7 +8,6 @@ import (
 	"io"
 
 	"github.com/google/go-tpm/tpm2"
-	tpm3 "github.com/google/go-tpm/tpm2"
 	"github.com/google/go-tpm/tpm2/transport"
 )
 
@@ -35,7 +34,7 @@ func (m *baseKeyManager) Close() error {
 }
 
 // createPrimaryKey creates a primary key in the TPM for sealing operations.
-func (m *baseKeyManager) createPrimaryKey() (*tpm3.CreatePrimaryResponse, error) {
+func (m *baseKeyManager) createPrimaryKey() (*tpm2.CreatePrimaryResponse, error) {
 	primaryTemplate := tpm2.TPMTPublic{
 		Type:    tpm2.TPMAlgRSA,
 		NameAlg: tpm2.TPMAlgSHA256,
@@ -66,9 +65,9 @@ func (m *baseKeyManager) createPrimaryKey() (*tpm3.CreatePrimaryResponse, error)
 		),
 	}
 
-	createPrimary := tpm3.CreatePrimary{
+	createPrimary := tpm2.CreatePrimary{
 		PrimaryHandle: tpm2.TPMRHOwner,
-		InPublic:      tpm3.New2B(primaryTemplate),
+		InPublic:      tpm2.New2B(primaryTemplate),
 	}
 
 	return createPrimary.Execute(m.tpm)
@@ -90,7 +89,7 @@ func (m *baseKeyManager) SealKey(key []byte) (*SealedData, error) {
 	}
 
 	defer func() {
-		flushContext := tpm3.FlushContext{
+		flushContext := tpm2.FlushContext{
 			FlushHandle: primaryResp.ObjectHandle,
 		}
 		_, _ = flushContext.Execute(m.tpm)
@@ -114,14 +113,14 @@ func (m *baseKeyManager) SealKey(key []byte) (*SealedData, error) {
 		},
 	}
 
-	create := tpm3.Create{
-		ParentHandle: tpm3.AuthHandle{
+	create := tpm2.Create{
+		ParentHandle: tpm2.AuthHandle{
 			Handle: primaryResp.ObjectHandle,
 			Name:   primaryResp.Name,
-			Auth:   tpm3.PasswordAuth(nil),
+			Auth:   tpm2.PasswordAuth(nil),
 		},
 		InSensitive: inSensitive,
-		InPublic:    tpm3.New2B(sealTemplate),
+		InPublic:    tpm2.New2B(sealTemplate),
 	}
 
 	createResp, err := create.Execute(m.tpm)
@@ -129,9 +128,9 @@ func (m *baseKeyManager) SealKey(key []byte) (*SealedData, error) {
 		return nil, fmt.Errorf("%w: failed to create sealed object: %v", ErrSealFailed, err)
 	}
 
-	pubBytes := tpm3.Marshal(primaryResp.OutPublic)
-	privBytes := tpm3.Marshal(createResp.OutPrivate)
-	sealedPubBytes := tpm3.Marshal(createResp.OutPublic)
+	pubBytes := tpm2.Marshal(primaryResp.OutPublic)
+	privBytes := tpm2.Marshal(createResp.OutPrivate)
+	sealedPubBytes := tpm2.Marshal(createResp.OutPublic)
 
 	return &SealedData{
 		PublicArea:       pubBytes,
@@ -156,27 +155,27 @@ func (m *baseKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
 	}
 
 	defer func() {
-		flushContext := tpm3.FlushContext{
+		flushContext := tpm2.FlushContext{
 			FlushHandle: primaryResp.ObjectHandle,
 		}
 		_, _ = flushContext.Execute(m.tpm)
 	}()
 
-	outPrivate, err := tpm3.Unmarshal[tpm2.TPM2BPrivate](data.PrivateArea)
+	outPrivate, err := tpm2.Unmarshal[tpm2.TPM2BPrivate](data.PrivateArea)
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to unmarshal private area: %v", ErrUnsealFailed, err)
 	}
 
-	outPublic, err := tpm3.Unmarshal[tpm2.TPM2BPublic](data.SealedBlobPublic)
+	outPublic, err := tpm2.Unmarshal[tpm2.TPM2BPublic](data.SealedBlobPublic)
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to unmarshal public area: %v", ErrUnsealFailed, err)
 	}
 
-	load := tpm3.Load{
-		ParentHandle: tpm3.AuthHandle{
+	load := tpm2.Load{
+		ParentHandle: tpm2.AuthHandle{
 			Handle: primaryResp.ObjectHandle,
 			Name:   primaryResp.Name,
-			Auth:   tpm3.PasswordAuth(nil),
+			Auth:   tpm2.PasswordAuth(nil),
 		},
 		InPrivate: *outPrivate,
 		InPublic:  *outPublic,
@@ -188,17 +187,17 @@ func (m *baseKeyManager) UnsealKey(data *SealedData) ([]byte, error) {
 	}
 
 	defer func() {
-		flushContext := tpm3.FlushContext{
+		flushContext := tpm2.FlushContext{
 			FlushHandle: loadResp.ObjectHandle,
 		}
 		_, _ = flushContext.Execute(m.tpm)
 	}()
 
-	unseal := tpm3.Unseal{
-		ItemHandle: tpm3.AuthHandle{
+	unseal := tpm2.Unseal{
+		ItemHandle: tpm2.AuthHandle{
 			Handle: loadResp.ObjectHandle,
 			Name:   loadResp.Name,
-			Auth:   tpm3.PasswordAuth(nil),
+			Auth:   tpm2.PasswordAuth(nil),
 		},
 	}
 
@@ -244,7 +243,7 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 	}
 
 	defer func() {
-		fc := tpm3.FlushContext{FlushHandle: primaryResp.ObjectHandle}
+		fc := tpm2.FlushContext{FlushHandle: primaryResp.ObjectHandle}
 		_, _ = fc.Execute(m.tpm)
 	}()
 
@@ -298,14 +297,14 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 		}
 	}
 
-	create := tpm3.Create{
-		ParentHandle: tpm3.AuthHandle{
+	create := tpm2.Create{
+		ParentHandle: tpm2.AuthHandle{
 			Handle: primaryResp.ObjectHandle,
 			Name:   primaryResp.Name,
-			Auth:   tpm3.PasswordAuth(nil),
+			Auth:   tpm2.PasswordAuth(nil),
 		},
 		InSensitive: inSensitive,
-		InPublic:    tpm3.New2B(sealTemplate),
+		InPublic:    tpm2.New2B(sealTemplate),
 	}
 
 	createResp, err := create.Execute(m.tpm)
@@ -313,9 +312,9 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 		return nil, fmt.Errorf("%w: failed to create sealed object: %v", ErrSealFailed, err)
 	}
 
-	pubBytes := tpm3.Marshal(primaryResp.OutPublic)
-	privBytes := tpm3.Marshal(createResp.OutPrivate)
-	sealedPubBytes := tpm3.Marshal(createResp.OutPublic)
+	pubBytes := tpm2.Marshal(primaryResp.OutPublic)
+	privBytes := tpm2.Marshal(createResp.OutPrivate)
+	sealedPubBytes := tpm2.Marshal(createResp.OutPublic)
 
 	return &SealedData{
 		Version:          SealedDataV2,
@@ -365,25 +364,25 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	}
 
 	defer func() {
-		fc := tpm3.FlushContext{FlushHandle: primaryResp.ObjectHandle}
+		fc := tpm2.FlushContext{FlushHandle: primaryResp.ObjectHandle}
 		_, _ = fc.Execute(m.tpm)
 	}()
 
-	outPrivate, err := tpm3.Unmarshal[tpm2.TPM2BPrivate](data.PrivateArea)
+	outPrivate, err := tpm2.Unmarshal[tpm2.TPM2BPrivate](data.PrivateArea)
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to unmarshal private area: %v", ErrUnsealFailed, err)
 	}
 
-	outPublic, err := tpm3.Unmarshal[tpm2.TPM2BPublic](data.SealedBlobPublic)
+	outPublic, err := tpm2.Unmarshal[tpm2.TPM2BPublic](data.SealedBlobPublic)
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to unmarshal public area: %v", ErrUnsealFailed, err)
 	}
 
-	load := tpm3.Load{
-		ParentHandle: tpm3.AuthHandle{
+	load := tpm2.Load{
+		ParentHandle: tpm2.AuthHandle{
 			Handle: primaryResp.ObjectHandle,
 			Name:   primaryResp.Name,
-			Auth:   tpm3.PasswordAuth(nil),
+			Auth:   tpm2.PasswordAuth(nil),
 		},
 		InPrivate: *outPrivate,
 		InPublic:  *outPublic,
@@ -395,7 +394,7 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 	}
 
 	defer func() {
-		fc := tpm3.FlushContext{FlushHandle: loadResp.ObjectHandle}
+		fc := tpm2.FlushContext{FlushHandle: loadResp.ObjectHandle}
 		_, _ = fc.Execute(m.tpm)
 	}()
 
@@ -414,8 +413,8 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 
 	defer func() { _ = cleanup() }()
 
-	unseal := tpm3.Unseal{
-		ItemHandle: tpm3.AuthHandle{
+	unseal := tpm2.Unseal{
+		ItemHandle: tpm2.AuthHandle{
 			Handle: loadResp.ObjectHandle,
 			Name:   loadResp.Name,
 			Auth:   sess,
