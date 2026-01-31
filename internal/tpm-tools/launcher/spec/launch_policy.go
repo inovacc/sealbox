@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/go-tpm-tools/launcher/internal/logging"
+	"github.com/inovacc/keystore/internal/tpm-tools/launcher/internal/logging"
 )
 
 // LaunchPolicy contains policies on starting the container.

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
 )
 
 // ExternalTPM can be set to run tests against an TPM initialized by an

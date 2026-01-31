@@ -12,9 +12,8 @@ import (
 	spb "github.com/google/go-sev-guest/proto/sevsnp"
 	tabi "github.com/google/go-tdx-guest/abi"
 	tpb "github.com/google/go-tdx-guest/proto/tdx"
-	"github.com/google/go-tpm-tools/verifier"
-	"github.com/google/go-tpm-tools/verifier/models"
-	"github.com/googleapis/gax-go/v2"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/models"
 
 	v1 "cloud.google.com/go/confidentialcomputing/apiv1"
 	ccpb "cloud.google.com/go/confidentialcomputing/apiv1/confidentialcomputingpb"

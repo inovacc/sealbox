@@ -3,9 +3,9 @@ package cmd
 import (
 	"testing"
 
-	"github.com/google/go-tpm-tools/client"
-	"github.com/google/go-tpm-tools/internal/test"
 	"github.com/google/go-tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
 )
 
 func TestFlushNothing(t *testing.T) {

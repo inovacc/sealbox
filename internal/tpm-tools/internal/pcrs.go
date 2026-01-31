@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 
-	pb "github.com/google/go-tpm-tools/proto/tpm"
 	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/google/go-tpm/tpmutil"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 )
 
 const minPCRIndex = uint32(0)

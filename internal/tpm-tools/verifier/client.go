@@ -5,8 +5,8 @@ package verifier
 import (
 	"context"
 
-	attestpb "github.com/google/go-tpm-tools/proto/attest"
-	"github.com/google/go-tpm-tools/verifier/models"
+	attestpb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/models"
 	"google.golang.org/genproto/googleapis/rpc/status"
 )
 

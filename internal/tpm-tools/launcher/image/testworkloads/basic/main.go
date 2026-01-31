@@ -4,8 +4,6 @@ package main
 import (
 	"fmt"
 	"os"
-
-	"github.com/golang-jwt/jwt/v4"
 )
 
 const tokendir = "/run/container_launcher/attestation_verifier_claims_token"

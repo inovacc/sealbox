@@ -10,9 +10,9 @@ import (
 	gepb "github.com/google/go-eventlog/proto/state"
 	"github.com/google/go-eventlog/register"
 	"github.com/google/go-eventlog/tpmeventlog"
-	"github.com/google/go-tpm-tools/cel"
-	pb "github.com/google/go-tpm-tools/proto/attest"
-	tpmpb "github.com/google/go-tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm-tools/cel"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
+	tpmpb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 )
 
 // parsePCClientEventLog parses a raw event log and replays the parsed event

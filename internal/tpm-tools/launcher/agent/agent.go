@@ -17,7 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/google/go-tpm/tpmutil"
 
@@ -27,17 +26,17 @@ import (
 
 	gecel "github.com/google/go-eventlog/cel"
 
-	"github.com/google/go-tpm-tools/cel"
-	"github.com/google/go-tpm-tools/client"
-	"github.com/google/go-tpm-tools/internal"
-	"github.com/google/go-tpm-tools/launcher/internal/logging"
-	"github.com/google/go-tpm-tools/launcher/internal/signaturediscovery"
-	"github.com/google/go-tpm-tools/launcher/spec"
-	pb "github.com/google/go-tpm-tools/proto/attest"
-	"github.com/google/go-tpm-tools/verifier"
-	"github.com/google/go-tpm-tools/verifier/models"
-	"github.com/google/go-tpm-tools/verifier/oci"
-	"github.com/google/go-tpm-tools/verifier/util"
+	"github.com/inovacc/keystore/internal/tpm-tools/cel"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal"
+	"github.com/inovacc/keystore/internal/tpm-tools/launcher/internal/logging"
+	"github.com/inovacc/keystore/internal/tpm-tools/launcher/internal/signaturediscovery"
+	"github.com/inovacc/keystore/internal/tpm-tools/launcher/spec"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/models"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/oci"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/util"
 )
 
 const (

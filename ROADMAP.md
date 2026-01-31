@@ -257,24 +257,37 @@ Return `ErrTPMNotSupported` on macOS, recommend Linux/Windows for TPM features.
 
 **Goal:** Add advanced TPM features for power users.
 
-### Planned Features
+**Status:** 🔄 In Progress (Key Hierarchy complete)
 
-#### Key Hierarchy
+### Implemented Features
 
-Support multiple sealed keys under a primary:
+#### Key Hierarchy ✅
+
+Support multiple sealed keys under common storage (`hierarchy.go`):
 
 ```go
-type KeyHierarchy struct {
-    Primary   *SealedData
-    Children  map[string]*SealedData
-}
+// Create a key hierarchy manager
+mgr, _ := NewKeyHierarchyManager(km, "/path/to/store")
 
-func (km *KeyManager) CreateChildKey(parent *SealedData, name string) (*SealedData, error)
+// Generate named keys
+mgr.GenerateKey("api-key")
+mgr.GenerateKey("db-password")
+
+// Seal custom data
+mgr.SealKey("custom-secret", []byte("secret-data"))
+
+// Unseal keys by name
+key, _ := mgr.UnsealKey("api-key")
+
+// Save hierarchy to disk
+mgr.Save()
 ```
+
+### Planned Features
 
 #### Attestation
 
-Remote attestation support:
+Remote attestation support (not yet implemented):
 
 ```go
 type AttestationData struct {
@@ -288,7 +301,7 @@ func (km *KeyManager) CreateAttestation(nonce []byte) (*AttestationData, error)
 
 ### Deliverables
 
-- [ ] Key hierarchy support
+- [x] Key hierarchy support (`KeyHierarchy`, `KeyHierarchyManager`)
 - [ ] Remote attestation (if needed)
 
 ---
@@ -301,7 +314,7 @@ func (km *KeyManager) CreateAttestation(nonce []byte) (*AttestationData, error)
 | Phase 2: Code Quality & Testing | Q1 2025 | ✅ Complete |
 | Phase 3: Security Hardening | Q1 2025 | ✅ Complete |
 | Phase 4: macOS (Research) | Q2 2025 | 🔲 Not Started |
-| Phase 5: Advanced Features | Q3 2025 | 🔲 Not Started |
+| Phase 5: Advanced Features | Q3 2025 | 🔄 In Progress (Key Hierarchy ✅) |
 
 ---
 

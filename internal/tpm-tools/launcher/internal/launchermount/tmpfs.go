@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
-
-	"github.com/opencontainers/runtime-spec/specs-go"
 )
 
 var errTmpfsMustHaveDest = errors.New("mount type \"tmpfs\" must have destination specified")

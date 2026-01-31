@@ -3,8 +3,8 @@ package internal
 import (
 	"testing"
 
-	pb "github.com/google/go-tpm-tools/proto/tpm"
 	"github.com/google/go-tpm/legacy/tpm2"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 )
 
 func TestHasSamePCRSelection(t *testing.T) {

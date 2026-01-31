@@ -4,8 +4,8 @@ import (
 	"crypto"
 	"testing"
 
-	"github.com/google/go-tpm-tools/client"
-	"github.com/google/go-tpm-tools/server"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/server"
 )
 
 func TestGetTPM(t *testing.T) {

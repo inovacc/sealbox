@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-tpm-tools/launcher/internal/launchermount"
-	"github.com/google/go-tpm-tools/launcher/internal/logging"
+	"github.com/inovacc/keystore/internal/tpm-tools/launcher/internal/launchermount"
+	"github.com/inovacc/keystore/internal/tpm-tools/launcher/internal/logging"
 )
 
 func TestLaunchPolicy(t *testing.T) {

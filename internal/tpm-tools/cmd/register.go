@@ -3,11 +3,11 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/google/go-tpm-tools/client"
-	tpb "github.com/google/go-tpm-tools/proto/tpm"
-	"github.com/google/go-tpm-tools/server"
 	"github.com/google/go-tpm/tpm2"
 	"github.com/google/go-tpm/tpm2/transport"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	tpb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm-tools/server"
 	"github.com/spf13/cobra"
 )
 

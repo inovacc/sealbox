@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/google/go-tpm-tools/internal/test"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
 )
 
 // GetTPM is a cross-platform testing helper function that retrives the

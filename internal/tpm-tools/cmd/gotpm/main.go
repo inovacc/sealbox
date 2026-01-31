@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/google/go-tpm-tools/cmd"
+	"github.com/inovacc/keystore/internal/tpm-tools/cmd"
 )
 
 // GoReleaser will populates those fields

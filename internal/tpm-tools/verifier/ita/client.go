@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/google/go-tpm-tools/verifier"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier"
 )
 
 const (

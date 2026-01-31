@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm-tools/client"
 	"github.com/google/go-tpm/legacy/tpm2"
 	directtpm2 "github.com/google/go-tpm/tpm2"
 	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/spf13/cobra"
 )
 

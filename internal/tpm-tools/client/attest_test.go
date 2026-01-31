@@ -14,8 +14,8 @@ import (
 	tgtest "github.com/google/go-tdx-guest/testing"
 	tgtestclient "github.com/google/go-tdx-guest/testing/client"
 	tgtestdata "github.com/google/go-tdx-guest/testing/testdata"
-	"github.com/google/go-tpm-tools/internal/test"
-	pb "github.com/google/go-tpm-tools/proto/attest"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 )
 
 var localClient = http.DefaultClient

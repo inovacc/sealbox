@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/google/go-tpm-tools/client"
-	"github.com/google/go-tpm-tools/verifier"
-	"github.com/google/go-tpm-tools/verifier/rest"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/rest"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )

@@ -16,13 +16,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-tpm-tools/client"
-	"github.com/google/go-tpm-tools/internal"
-	"github.com/google/go-tpm-tools/internal/test"
-	attestpb "github.com/google/go-tpm-tools/proto/attest"
 	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/google/go-tpm/tpmutil"
 	"github.com/google/logger"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
+	attestpb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 	"google.golang.org/protobuf/proto"
 )
 

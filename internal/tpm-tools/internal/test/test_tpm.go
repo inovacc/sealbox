@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/google/go-attestation/attest"
-	"github.com/google/go-tpm-tools/simulator"
 	"github.com/google/go-tpm/legacy/tpm2"
 	gtpm2 "github.com/google/go-tpm/tpm2"
 	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm-tools/simulator"
 )
 
 // Only open the TPM device once. Reopening the device causes issues on Linux.

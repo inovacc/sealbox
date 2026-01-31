@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/opencontainers/runtime-spec/specs-go"
 )
 
 func TestCreateTmpfsMountAndSpecsMount(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/google/go-tpm-tools/verifier/oci"
+	"github.com/inovacc/keystore/internal/tpm-tools/verifier/oci"
 )
 
 type fakeSig struct {

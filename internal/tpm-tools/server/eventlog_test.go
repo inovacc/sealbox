@@ -15,13 +15,13 @@ import (
 	gepb "github.com/google/go-eventlog/proto/state"
 	"github.com/google/go-eventlog/register"
 	"github.com/google/go-tdx-guest/rtmr"
-	"github.com/google/go-tpm-tools/cel"
-	"github.com/google/go-tpm-tools/client"
-	"github.com/google/go-tpm-tools/internal/test"
-	attestpb "github.com/google/go-tpm-tools/proto/attest"
-	pb "github.com/google/go-tpm-tools/proto/tpm"
 	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm-tools/cel"
+	"github.com/inovacc/keystore/internal/tpm-tools/client"
+	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
+	attestpb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 

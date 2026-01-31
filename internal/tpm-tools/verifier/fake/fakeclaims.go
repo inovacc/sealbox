@@ -1,7 +1,5 @@
 package fake
 
-import "github.com/golang-jwt/jwt/v4"
-
 // Verify that Claims implements jwt.Claims.
 var _ jwt.Claims = Claims{}
 

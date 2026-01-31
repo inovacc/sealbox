@@ -1,8 +1,6 @@
 // Package launchermount defines mount types for the launcher workload.
 package launchermount
 
-import "github.com/opencontainers/runtime-spec/specs-go"
-
 // Key-value constants for mount configurations.
 // Keys are used to specify the specific mount configuration.
 // For example, TypeKey is used to specify the type of mount.

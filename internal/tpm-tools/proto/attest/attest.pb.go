@@ -9,7 +9,7 @@ package attest
 import (
 	sevsnp "github.com/google/go-sev-guest/proto/sevsnp"
 	tdx "github.com/google/go-tdx-guest/proto/tdx"
-	tpm "github.com/google/go-tpm-tools/proto/tpm"
+	tpm "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

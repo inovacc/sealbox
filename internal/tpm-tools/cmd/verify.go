@@ -9,9 +9,9 @@ import (
 	sv "github.com/google/go-sev-guest/verify"
 	"github.com/google/go-tdx-guest/proto/tdx"
 	tv "github.com/google/go-tdx-guest/verify"
-	pb "github.com/google/go-tpm-tools/proto/attest"
-	"github.com/google/go-tpm-tools/server"
 	"github.com/google/go-tpm/legacy/tpm2"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
+	"github.com/inovacc/keystore/internal/tpm-tools/server"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 )

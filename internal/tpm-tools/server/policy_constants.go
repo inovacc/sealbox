@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
-	pb "github.com/google/go-tpm-tools/proto/attest"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 )
 
 // Expected TCG Event Log Event Types.

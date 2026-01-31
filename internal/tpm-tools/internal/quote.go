@@ -8,8 +8,8 @@ import (
 	"crypto/subtle"
 	"fmt"
 
-	pb "github.com/google/go-tpm-tools/proto/tpm"
 	"github.com/google/go-tpm/legacy/tpm2"
+	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 )
 
 // SignatureHashAlgs are the hash algorithms we support for Quote signatures, in
