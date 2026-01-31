@@ -16,7 +16,7 @@ This module provides **hardware-backed encryption key management** using your co
 ┌─────────────────────────────────────────────────────────────┐
 │                      Your Application                        │
 ├─────────────────────────────────────────────────────────────┤
-│                    keystore package                          │
+│                    sealbox package                          │
 │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
 │  │ Initialize()│    │ GetSealed   │    │   Reset()   │     │
 │  │             │    │ MasterKey() │    │             │     │
@@ -107,19 +107,19 @@ import (
 
 func main() {
     // Check if TPM is available
-    if !keystore.IsAvailable() {
+    if !sealbox.IsAvailable() {
         log.Fatal("TPM not available on this system")
     }
 
     // Configure storage path (required - no defaults)
     // Option 1: Use platform-specific path
-    opts := keystore.WithAppConfig("myapp", "sealed.key")
+    opts := sealbox.WithAppConfig("myapp", "sealed.key")
     // Option 2: Use explicit path
-    // opts := keystore.WithStorePath("/path/to/sealed.key")
+    // opts := sealbox.WithStorePath("/path/to/sealed.key")
 
     // Initialize: generate, seal, and store a new key
-    if err := keystore.Initialize(opts); err != nil {
-        if err == keystore.ErrKeyExists {
+    if err := sealbox.Initialize(opts); err != nil {
+        if err == sealbox.ErrKeyExists {
             log.Println("Key already exists, skipping initialization")
         } else {
             log.Fatalf("Failed to initialize: %v", err)
@@ -127,7 +127,7 @@ func main() {
     }
 
     // Later: retrieve the sealed key
-    key, err := keystore.GetSealedMasterKey(opts)
+    key, err := sealbox.GetSealedMasterKey(opts)
     if err != nil {
         log.Fatalf("Failed to get sealed key: %v", err)
     }
@@ -141,7 +141,7 @@ func main() {
 For more control, use the KeyManager and KeyStore interfaces directly:
 
 ```go
-km, err := keystore.NewKeyManager()
+km, err := sealbox.NewKeyManager()
 if err != nil {
     log.Fatal(err)
 }
@@ -154,7 +154,7 @@ if err != nil {
 }
 
 // Store the sealed data (path is required)
-store, err := keystore.NewKeyStore(keystore.WithAppConfig("myapp", "sealed.key"))
+store, err := sealbox.NewKeyStore(sealbox.WithAppConfig("myapp", "sealed.key"))
 if err != nil {
     log.Fatalf("Failed to create key store: %v", err)
 }
@@ -173,7 +173,7 @@ For enhanced security, use policy-based sealing with PCR binding and/or password
 ```go
 import "github.com/google/go-tpm/tpm2"
 
-km, err := keystore.NewKeyManager()
+km, err := sealbox.NewKeyManager()
 if err != nil {
     log.Fatal(err)
 }
@@ -181,23 +181,23 @@ defer km.Close()
 
 // Seal with password protection
 sealed, err := km.SealKeyWithOptions(myKey,
-    keystore.WithPassword([]byte("my-secret-password")),
+    sealbox.WithPassword([]byte("my-secret-password")),
 )
 
 // Seal with PCR binding (key only works if PCRs match)
 sealed, err := km.SealKeyWithOptions(myKey,
-    keystore.WithPCRs(tpm2.TPMAlgSHA256, 0, 1, 7),
+    sealbox.WithPCRs(tpm2.TPMAlgSHA256, 0, 1, 7),
 )
 
 // Seal with both password AND PCR binding
 sealed, err := km.SealKeyWithOptions(myKey,
-    keystore.WithPassword([]byte("password")),
-    keystore.WithPCRs(tpm2.TPMAlgSHA256, 0, 7),
+    sealbox.WithPassword([]byte("password")),
+    sealbox.WithPCRs(tpm2.TPMAlgSHA256, 0, 7),
 )
 
 // Unseal with password
 key, err := km.UnsealKeyWithOptions(sealed,
-    keystore.WithPassword([]byte("my-secret-password")),
+    sealbox.WithPassword([]byte("my-secret-password")),
 )
 
 // Read current PCR values
@@ -210,10 +210,10 @@ Use the provided utilities to zero sensitive data after use:
 
 ```go
 // Zero a byte slice
-keystore.SecureZero(sensitiveKey)
+sealbox.SecureZero(sensitiveKey)
 
 // Use key with automatic cleanup
-err := keystore.WithKeyCleanup(key, func(k []byte) error {
+err := sealbox.WithKeyCleanup(key, func(k []byte) error {
     // Use the key
     return encrypt(data, k)
 })
@@ -229,7 +229,7 @@ err := keystore.WithKeyCleanup(key, func(k []byte) error {
 Checks if TPM hardware is accessible on the current system.
 
 ```go
-if keystore.IsAvailable() {
+if sealbox.IsAvailable() {
     fmt.Println("TPM is available")
 }
 ```
@@ -239,7 +239,7 @@ if keystore.IsAvailable() {
 Creates a new TPM key manager for sealing/unsealing operations.
 
 ```go
-km, err := keystore.NewKeyManager()
+km, err := sealbox.NewKeyManager()
 if err != nil {
     log.Fatal(err)
 }
@@ -252,10 +252,10 @@ Creates a key store for persisting sealed data to disk. **At least one option is
 
 ```go
 // Option 1: Platform-specific path (~/.config/myapp/sealed.key on Linux)
-store, err := keystore.NewKeyStore(keystore.WithAppConfig("myapp", "sealed.key"))
+store, err := sealbox.NewKeyStore(sealbox.WithAppConfig("myapp", "sealed.key"))
 
 // Option 2: Explicit path
-store, err := keystore.NewKeyStore(keystore.WithStorePath("/path/to/sealed.key"))
+store, err := sealbox.NewKeyStore(sealbox.WithStorePath("/path/to/sealed.key"))
 ```
 
 #### `WithAppConfig(appName, fileName string) KeyStoreOption`
@@ -356,16 +356,16 @@ Functional options for sealing operations:
 
 ```go
 // Protect with password
-keystore.WithPassword(password []byte)
+sealbox.WithPassword(password []byte)
 
 // Bind to PCR values (reads current values)
-keystore.WithPCRs(hash tpm2.TPMIAlgHash, pcrs ...uint)
+sealbox.WithPCRs(hash tpm2.TPMIAlgHash, pcrs ...uint)
 
 // Bind to specific PCR digest
-keystore.WithPCRDigest(hash tpm2.TPMIAlgHash, digest []byte, pcrs ...uint)
+sealbox.WithPCRDigest(hash tpm2.TPMIAlgHash, digest []byte, pcrs ...uint)
 
 // Enable session encryption
-keystore.WithSessionEncryption()
+sealbox.WithSessionEncryption()
 ```
 
 ## Storage Locations
@@ -499,7 +499,7 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 ## Dependencies
 
 - `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
-  - See [internal/tpm/forked.md](pkg/keystore/internal/tpm/forked.md) for 64 tracked upstream issues
+  - See [internal/tpm/forked.md](pkg/sealbox/internal/tpm/forked.md) for 64 tracked upstream issues
 
 ## Examples
 
@@ -508,7 +508,7 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 ## Documentation
 
 - [ROADMAP.md](docs/ROADMAP.md) - Development phases, local issues, timeline
-- [internal/tpm/forked.md](pkg/keystore/internal/tpm/forked.md) - Upstream go-tpm issues by priority
+- [internal/tpm/forked.md](pkg/sealbox/internal/tpm/forked.md) - Upstream go-tpm issues by priority
 
 ## License
 

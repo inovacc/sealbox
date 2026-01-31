@@ -1,6 +1,6 @@
 # Keystore Roadmap
 
-This roadmap outlines the development plan for the cross-platform TPM keystore package.
+This roadmap outlines the development plan for the cross-platform TPM sealbox package.
 
 ## Summary
 
@@ -30,8 +30,8 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 ### Critical (Blocks Compilation)
 
 - [x] Fix package name mismatch
-  - [x] `doc.go` declares `package tpm`, all others declare `package keystore`
-  - [x] Updated doc comments to use `keystore` package name
+  - [x] `doc.go` declares `package tpm`, all others declare `package sealbox`
+  - [x] Updated doc comments to use `sealbox` package name
 
 - [x] ~~Add missing constants~~ → Changed to require options (no defaults)
   - [x] `NewKeyStore()` now requires `WithStorePath` or `WithAppConfig`
@@ -39,7 +39,7 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 
 ### High Priority
 
-- [x] Fix duplicate option functions in `keystore.go:26-42`
+- [x] Fix duplicate option functions in `sealbox.go:26-42`
   - [x] Removed duplicate `WithFileName` function
   - [x] Renamed `WithAppName` to `WithAppConfig(appName, fileName)`
 
@@ -80,7 +80,7 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
   - [x] Platform files now only contain transport-specific code (~60 lines → ~35 lines each)
 
 - [x] Add unit tests
-  - [x] `keystore.go` - FileKeyStore operations (`helpers_test.go`)
+  - [x] `sealbox.go` - FileKeyStore operations (`helpers_test.go`)
   - [x] `helpers.go` - High-level API (`helpers_test.go`)
   - [x] Mock KeyManager interface for testing (`mock_keymanager.go`)
 
@@ -128,7 +128,7 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 - [x] Windows file permissions
   - [x] Proper ACLs using internal `acl` package
   - [x] Current-user-only access on Windows
-  - [x] Platform-specific `keystore_windows.go` and `keystore_unix.go`
+  - [x] Platform-specific `sealbox_windows.go` and `sealbox_unix.go`
 
 - [x] Security audit
   - [x] Added `SecureZero()` for zeroing sensitive data
@@ -143,8 +143,8 @@ This roadmap outlines the development plan for the cross-platform TPM keystore p
 | `seal_options.go` | Functional options (WithPassword, WithPCRs, etc.) |
 | `policy.go` | Policy computation and session helpers |
 | `security.go` | Memory zeroing utilities |
-| `keystore_windows.go` | Windows ACL handling |
-| `keystore_unix.go` | Unix permissions |
+| `sealbox_windows.go` | Windows ACL handling |
+| `sealbox_unix.go` | Unix permissions |
 
 ### New Errors Added
 
@@ -341,9 +341,9 @@ Issues discovered during code analysis that need to be addressed:
 
 | Issue | Severity | File | Line |
 |-------|----------|------|------|
-| ~~Package mismatch (`tpm` vs `keystore`)~~ | ~~Critical~~ | ~~`doc.go`~~ | ✅ Fixed |
-| ~~Missing defaults~~ | ~~Critical~~ | ~~`keystore.go`~~ | ✅ Changed to require options |
-| ~~Duplicate `WithAppName`/`WithFileName` functions~~ | ~~High~~ | ~~`keystore.go`~~ | ✅ Fixed |
+| ~~Package mismatch (`tpm` vs `sealbox`)~~ | ~~Critical~~ | ~~`doc.go`~~ | ✅ Fixed |
+| ~~Missing defaults~~ | ~~Critical~~ | ~~`sealbox.go`~~ | ✅ Changed to require options |
+| ~~Duplicate `WithAppName`/`WithFileName` functions~~ | ~~High~~ | ~~`sealbox.go`~~ | ✅ Fixed |
 | ~~Redundant `SealedBlob` field~~ | ~~Medium~~ | ~~`types.go`~~ | ✅ Removed |
 | ~~No nil check in `UnsealKey`~~ | ~~Medium~~ | ~~`tpm_*.go`~~ | ✅ Fixed |
 | ~~`Initialize` overwrites existing key~~ | ~~Medium~~ | ~~`helpers.go`~~ | ✅ Fixed |
@@ -358,7 +358,7 @@ Issues discovered during code analysis that need to be addressed:
 | `internal/tpm-tools/simulator/` | ✅ Fixed | Imports updated to internal paths |
 | `internal/tpm-tools/` (other) | ⚠️ External imports | 342 external imports across 111 files - not used by main package |
 
-**Note:** The `internal/tpm-tools/` package still has many external Google imports. This doesn't affect the main keystore functionality since only the simulator package is used, and that has been fixed.
+**Note:** The `internal/tpm-tools/` package still has many external Google imports. This doesn't affect the main sealbox functionality since only the simulator package is used, and that has been fixed.
 
 ---
 

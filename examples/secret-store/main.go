@@ -31,7 +31,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/inovacc/sealbox/pkg/keystore"
+	"github.com/inovacc/sealbox"
 )
 
 const (
@@ -99,20 +99,20 @@ func printUsage() {
 	fmt.Println("  secret-store status        Show TPM and key status")
 }
 
-func keystoreOpts() keystore.KeyStoreOption {
-	return keystore.WithAppConfig(appName, keyFile)
+func keystoreOpts() sealbox.KeyStoreOption {
+	return sealbox.WithAppConfig(appName, keyFile)
 }
 
 func cmdInit() {
 	// Check TPM availability
-	if !keystore.IsAvailable() {
+	if !sealbox.IsAvailable() {
 		fmt.Println("Error: TPM is not available on this system")
 		os.Exit(1)
 	}
 
 	// Initialize the TPM-sealed key
-	err := keystore.Initialize(keystoreOpts())
-	if err == keystore.ErrKeyExists {
+	err := sealbox.Initialize(keystoreOpts())
+	if err == sealbox.ErrKeyExists {
 		fmt.Println("TPM key already initialized")
 		return
 	}
@@ -242,7 +242,7 @@ func cmdReset() {
 	_ = os.Remove(secretsPath)
 
 	// Reset TPM key
-	err := keystore.Reset(keystoreOpts())
+	err := sealbox.Reset(keystoreOpts())
 	if err != nil {
 		fmt.Printf("Error resetting TPM key: %v\n", err)
 		os.Exit(1)
@@ -253,10 +253,10 @@ func cmdReset() {
 
 func cmdStatus() {
 	fmt.Println("TPM Status:")
-	fmt.Printf("  Available: %v\n", keystore.IsAvailable())
-	fmt.Printf("  Key initialized: %v\n", keystore.HasKey(keystoreOpts()))
+	fmt.Printf("  Available: %v\n", sealbox.IsAvailable())
+	fmt.Printf("  Key initialized: %v\n", sealbox.HasKey(keystoreOpts()))
 
-	path, err := keystore.GetKeyStorePath(keystoreOpts())
+	path, err := sealbox.GetKeyStorePath(keystoreOpts())
 	if err == nil {
 		fmt.Printf("  Key path: %s\n", path)
 	}
@@ -267,12 +267,12 @@ func cmdStatus() {
 
 // getMasterKey retrieves and unseals the master key from TPM
 func getMasterKey() []byte {
-	if !keystore.HasKey(keystoreOpts()) {
+	if !sealbox.HasKey(keystoreOpts()) {
 		fmt.Println("Error: TPM key not initialized. Run 'secret-store init' first.")
 		os.Exit(1)
 	}
 
-	key, err := keystore.GetSealedMasterKey(keystoreOpts())
+	key, err := sealbox.GetSealedMasterKey(keystoreOpts())
 	if err != nil {
 		fmt.Printf("Error retrieving master key: %v\n", err)
 		os.Exit(1)
@@ -331,7 +331,7 @@ func decrypt(ciphertext, key []byte) ([]byte, error) {
 // getSecretsPath returns the path to the secrets file
 func getSecretsPath() string {
 	// Use same directory as the keystore
-	keyPath, _ := keystore.GetKeyStorePath(keystoreOpts())
+	keyPath, _ := sealbox.GetKeyStorePath(keystoreOpts())
 	return filepath.Join(filepath.Dir(keyPath), dataFile)
 }
 
