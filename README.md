@@ -171,7 +171,7 @@ fmt.Printf("Key sealed and stored at: %s\n", store.Path())
 For enhanced security, use policy-based sealing with PCR binding and/or password protection:
 
 ```go
-import "github.com/inovacc/keystore/internal/tpm/tpm2"
+import "github.com/google/go-tpm/tpm2"
 
 km, err := keystore.NewKeyManager()
 if err != nil {
@@ -499,7 +499,7 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 ## Dependencies
 
 - `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
-  - See [internal/tpm/forked.md](internal/tpm/forked.md) for 64 tracked upstream issues
+  - See [internal/tpm/forked.md](pkg/keystore/internal/tpm/forked.md) for 64 tracked upstream issues
 
 ## Examples
 
@@ -508,7 +508,7 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 ## Documentation
 
 - [ROADMAP.md](ROADMAP.md) - Development phases, local issues, timeline
-- [internal/tpm/forked.md](internal/tpm/forked.md) - Upstream go-tpm issues by priority
+- [internal/tpm/forked.md](pkg/keystore/internal/tpm/forked.md) - Upstream go-tpm issues by priority
 
 ## License
 

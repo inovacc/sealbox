@@ -40,10 +40,12 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/certificate-transparency-go v1.1.2 // indirect
-	github.com/google/go-tpm v0.9.6 // indirect
+	github.com/google/go-tpm v0.9.8 // indirect
+	github.com/google/go-tpm-tools v0.4.7 // indirect
 	github.com/google/go-tspi v0.3.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
+	github.com/hectane/go-acl v0.0.0-20230122075934-ca0b05cb1adb // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
