@@ -180,7 +180,7 @@ func TestReset_WithMock(t *testing.T) {
 		t.Fatalf("Reset failed: %v", err)
 	}
 
-	// Verify file is gone
+	// Verify a file is gone
 	if _, err := os.Stat(storePath); !os.IsNotExist(err) {
 		t.Error("key file should not exist after reset")
 	}

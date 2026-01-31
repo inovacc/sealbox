@@ -35,7 +35,7 @@ func Initialize(opts ...KeyStoreOption) error {
 		return ErrTPMNotAvailable
 	}
 
-	// Check if key already exists
+	// Check if the key already exists
 	store, err := NewKeyStore(opts...)
 	if err != nil {
 		return fmt.Errorf("failed to create key store: %w", err)

@@ -283,7 +283,7 @@ func (m *baseKeyManager) SealKeyWithOptions(key []byte, opts ...SealOption) (*Se
 		},
 	}
 
-	// Build sensitive data with optional password
+	// Build sensitive data with an optional password
 	inSensitive := tpm2.TPM2BSensitiveCreate{
 		Sensitive: &tpm2.TPMSSensitiveCreate{
 			Data: tpm2.NewTPMUSensitiveCreate(&tpm2.TPM2BSensitiveData{
@@ -398,7 +398,7 @@ func (m *baseKeyManager) UnsealKeyWithOptions(data *SealedData, opts ...SealOpti
 		_, _ = fc.Execute(m.tpm)
 	}()
 
-	// Create policy session for unsealing
+	// Create a policy session for unsealing
 	ph := newPolicyHelper(m.tpm)
 
 	sess, cleanup, err := ph.createPolicySession(cfg)

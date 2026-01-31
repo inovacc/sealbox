@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	// defaultTPMDevice is the default TPM device path on Linux
+	// the defaultTPMDevice is the default TPM device path on Linux
 	defaultTPMDevice = "/dev/tpmrm0"
 )
 

@@ -39,7 +39,7 @@ func NewKeyHierarchy(basePath string) (*KeyHierarchy, error) {
 		keys:     make(map[string]*SealedData),
 	}
 
-	// Try to load existing hierarchy
+	// Try to load the existing hierarchy
 	if err := h.load(); err != nil && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to load key hierarchy: %w", err)
 	}
@@ -79,7 +79,7 @@ func (h *KeyHierarchy) Save() error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	// Create directory if it doesn't exist
+	// Create a directory if it doesn't exist
 	if err := os.MkdirAll(h.basePath, 0700); err != nil {
 		return fmt.Errorf("failed to create hierarchy directory: %w", err)
 	}
@@ -184,7 +184,7 @@ func (h *KeyHierarchy) Count() int {
 	return len(h.keys)
 }
 
-// Exists checks if a key with the given name exists in the hierarchy.
+// Exists There are checks if a key with the given name exists in the hierarchy.
 func (h *KeyHierarchy) Exists(name string) bool {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -194,7 +194,7 @@ func (h *KeyHierarchy) Exists(name string) bool {
 	return exists
 }
 
-// IsModified returns true if the hierarchy has been modified since last save.
+// IsModified returns true if the hierarchy has been modified since the last save.
 func (h *KeyHierarchy) IsModified() bool {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -211,7 +211,7 @@ func (h *KeyHierarchy) Clear() {
 	h.modified = true
 }
 
-// Delete removes the hierarchy file from disk.
+// Delete removes the hierarchy file from the disk.
 func (h *KeyHierarchy) Delete() error {
 	h.mu.Lock()
 	defer h.mu.Unlock()

@@ -1,6 +1,7 @@
 package sealbox
 
 import (
+	"errors"
 	"path/filepath"
 	"testing"
 )
@@ -107,13 +108,13 @@ func TestInitialize(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "init_test.key")
 	opts := WithStorePath(path)
 
-	// First initialize should succeed
+	// First, initialize should succeed
 	if err := Initialize(opts); err != nil {
 		t.Fatalf("Initialize failed: %v", err)
 	}
 
 	// Second initialize should return ErrKeyExists
-	if err := Initialize(opts); err != ErrKeyExists {
+	if err := Initialize(opts); !errors.Is(err, ErrKeyExists) {
 		t.Errorf("expected ErrKeyExists, got %v", err)
 	}
 }
@@ -127,7 +128,7 @@ func TestInitialize_NoTPM(t *testing.T) {
 	opts := WithStorePath(path)
 
 	err := Initialize(opts)
-	if err != ErrTPMNotAvailable {
+	if !errors.Is(err, ErrTPMNotAvailable) {
 		t.Errorf("expected ErrTPMNotAvailable, got %v", err)
 	}
 }
@@ -143,7 +144,7 @@ func TestGetSealedMasterKey(t *testing.T) {
 		t.Fatalf("Initialize failed: %v", err)
 	}
 
-	// Get sealed master key
+	// Get a sealed master key
 	key, err := GetSealedMasterKey(opts)
 	if err != nil {
 		t.Fatalf("GetSealedMasterKey failed: %v", err)
@@ -161,7 +162,7 @@ func TestGetSealedMasterKey_NoKey(t *testing.T) {
 	opts := WithStorePath(path)
 
 	_, err := GetSealedMasterKey(opts)
-	if err != ErrNoSealedKey {
+	if !errors.Is(err, ErrNoSealedKey) {
 		t.Errorf("expected ErrNoSealedKey, got %v", err)
 	}
 }
@@ -193,7 +194,7 @@ func TestEndToEnd(t *testing.T) {
 		t.Fatalf("GetSealedMasterKey failed: %v", err)
 	}
 
-	// 5. Get key again - should be same
+	// 5. Get key again - should be the same
 	key2, err := GetSealedMasterKey(opts)
 	if err != nil {
 		t.Fatalf("GetSealedMasterKey second call failed: %v", err)

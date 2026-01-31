@@ -43,7 +43,7 @@ var retryableTPMErrors = map[tpm2.TPMRC]struct{}{
 	tpm2.TPMRCMemory:         {}, // Out of shared object/session memory
 	tpm2.TPMRCSessionMemory:  {}, // Out of memory for session contexts
 	tpm2.TPMRCObjectMemory:   {}, // Out of memory for object contexts
-	tpm2.TPMRCSessionHandles: {}, // Out of session handles
+	tpm2.TPMRCSessionHandles: {}, // Out-of-session handles
 	tpm2.TPMRCNVRate:         {}, // TPM is rate-limiting NV accesses
 	tpm2.TPMRCNVUnavailable:  {}, // NV is not currently accessible
 }

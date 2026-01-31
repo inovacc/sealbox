@@ -1,6 +1,7 @@
 package sealbox
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -200,7 +201,7 @@ func TestKeyHierarchy_SaveAndLoad(t *testing.T) {
 		t.Fatalf("Save() error = %v", err)
 	}
 
-	// Load in new instance
+	// Load in a new instance
 	h2, err := NewKeyHierarchy(tmpDir)
 	if err != nil {
 		t.Fatalf("NewKeyHierarchy() after Save() error = %v", err)
@@ -229,7 +230,7 @@ func TestKeyHierarchy_Delete(t *testing.T) {
 		t.Fatalf("Delete() error = %v", err)
 	}
 
-	// Verify file is gone
+	// Verify a file is gone
 	filePath := filepath.Join(tmpDir, "hierarchy.json")
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		t.Error("hierarchy file should be deleted")
@@ -245,7 +246,7 @@ func TestKeyHierarchy_IsModified(t *testing.T) {
 	tmpDir := t.TempDir()
 	h, _ := NewKeyHierarchy(tmpDir)
 
-	// New hierarchy is not modified (no changes)
+	// The new hierarchy is not modified (no changes)
 	if h.IsModified() {
 		t.Error("New hierarchy should not be modified")
 	}
@@ -258,7 +259,7 @@ func TestKeyHierarchy_IsModified(t *testing.T) {
 		t.Error("After Add() should be modified")
 	}
 
-	// Save clears modified flag
+	// Save clears the modified flag
 	_ = h.Save()
 	if h.IsModified() {
 		t.Error("After Save() should not be modified")
@@ -384,7 +385,7 @@ func TestKeyHierarchyManager_CloseNoSave(t *testing.T) {
 		t.Fatalf("Close(false) error = %v", err)
 	}
 
-	// Verify file was NOT saved
+	// Verify a file was NOT saved
 	filePath := filepath.Join(tmpDir, "hierarchy.json")
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		t.Error("hierarchy file should not exist after Close(false)")
@@ -415,7 +416,7 @@ func TestKeyHierarchyManager_MultipleKeys(t *testing.T) {
 
 	// Unseal each key
 	for i := range 5 {
-		name := "key-" + string(rune('a'+i))
+		name := "key-" + fmt.Sprint(rune('a'+i))
 
 		key, err := mgr.UnsealKey(name)
 		if err != nil {

@@ -43,7 +43,6 @@ func NewKeyStore(opts ...KeyStoreOption) (*FileKeyStore, error) {
 	return s, nil
 }
 
-
 // Save stores sealed data to disk.
 func (s *FileKeyStore) Save(data *SealedData) error {
 	if data == nil {
@@ -54,7 +53,7 @@ func (s *FileKeyStore) Save(data *SealedData) error {
 		return ErrKeyStoreNotInitialized
 	}
 
-	// Ensure directory exists with restrictive permissions
+	// Ensure a directory exists with restrictive permissions
 	dir := filepath.Dir(s.storePath)
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
@@ -70,7 +69,7 @@ func (s *FileKeyStore) Save(data *SealedData) error {
 		return fmt.Errorf("failed to marshal sealed data: %w", err)
 	}
 
-	// Write to file with restricted permissions (owner read/write only)
+	// Write to a file with restricted permissions (owner read/write-only)
 	if err := os.WriteFile(s.storePath, jsonData, 0600); err != nil {
 		return fmt.Errorf("failed to write sealed key file: %w", err)
 	}
@@ -105,7 +104,7 @@ func (s *FileKeyStore) Load() (*SealedData, error) {
 	return &data, nil
 }
 
-// Exists checks if sealed data exists on disk.
+// Exists There are checks if sealed data exists on disk.
 func (s *FileKeyStore) Exists() bool {
 	if s.storePath == "" {
 		return false

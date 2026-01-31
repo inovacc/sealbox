@@ -1,6 +1,7 @@
 package sealbox
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -8,7 +9,7 @@ import (
 
 func TestNewKeyStore_RequiresOption(t *testing.T) {
 	_, err := NewKeyStore()
-	if err != ErrKeyStoreNotInitialized {
+	if !errors.Is(err, ErrKeyStoreNotInitialized) {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
 	}
 }
@@ -92,7 +93,7 @@ func TestFileKeyStore_LoadNonExistent(t *testing.T) {
 	}
 
 	_, err = store.Load()
-	if err != ErrNoSealedKey {
+	if !errors.Is(err, ErrNoSealedKey) {
 		t.Errorf("expected ErrNoSealedKey, got %v", err)
 	}
 }
@@ -197,7 +198,7 @@ func TestReset_NoOptions(t *testing.T) {
 
 func TestGetKeyStorePath_NoOptions(t *testing.T) {
 	_, err := GetKeyStorePath()
-	if err != ErrKeyStoreNotInitialized {
+	if !errors.Is(err, ErrKeyStoreNotInitialized) {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
 	}
 }
@@ -263,7 +264,7 @@ func TestFileKeyStore_DeleteEmptyPath(t *testing.T) {
 	store := &FileKeyStore{storePath: ""}
 
 	err := store.Delete()
-	if err != ErrKeyStoreNotInitialized {
+	if !errors.Is(err, ErrKeyStoreNotInitialized) {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
 	}
 }
@@ -272,7 +273,7 @@ func TestFileKeyStore_SaveEmptyPath(t *testing.T) {
 	store := &FileKeyStore{storePath: ""}
 
 	err := store.Save(&SealedData{PublicArea: []byte("test")})
-	if err != ErrKeyStoreNotInitialized {
+	if !errors.Is(err, ErrKeyStoreNotInitialized) {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
 	}
 }
@@ -281,7 +282,7 @@ func TestFileKeyStore_LoadEmptyPath(t *testing.T) {
 	store := &FileKeyStore{storePath: ""}
 
 	_, err := store.Load()
-	if err != ErrKeyStoreNotInitialized {
+	if !errors.Is(err, ErrKeyStoreNotInitialized) {
 		t.Errorf("expected ErrKeyStoreNotInitialized, got %v", err)
 	}
 }
@@ -291,21 +292,6 @@ func TestFileKeyStore_PathEmpty(t *testing.T) {
 	if store.Path() != "" {
 		t.Error("expected empty path")
 	}
-}
-
-// Helper function
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsHelper(s, substr))
-}
-
-func containsHelper(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-
-	return false
 }
 
 // Ensure temp directories are cleaned up

@@ -17,7 +17,7 @@ func setFilePermissions(path string) error {
 		return err
 	}
 
-	// Grant current user full control, deny everyone else
+	// Grant the current user full control, deny everyone else
 	return acl2.Apply(
 		path,
 		true,  // replace existing ACL

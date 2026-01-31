@@ -2,6 +2,7 @@ package sealbox
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/google/go-tpm/tpm2"
@@ -124,7 +125,7 @@ func TestMockKeyManagerUnsealWithOptions(t *testing.T) {
 		}
 
 		_, err = m.UnsealKeyWithOptions(sealed)
-		if err != ErrPasswordRequired {
+		if !errors.Is(err, ErrPasswordRequired) {
 			t.Errorf("expected ErrPasswordRequired, got %v", err)
 		}
 	})
@@ -142,7 +143,7 @@ func TestMockKeyManagerUnsealWithOptions(t *testing.T) {
 		}
 
 		_, err = m.UnsealKeyWithOptions(sealed, WithPassword([]byte("wrongpassword")))
-		if err != ErrInvalidPassword {
+		if !errors.Is(err, ErrInvalidPassword) {
 			t.Errorf("expected ErrInvalidPassword, got %v", err)
 		}
 	})
@@ -189,7 +190,7 @@ func TestMockKeyManagerUnsealWithOptions(t *testing.T) {
 		m.SetMockPCR(0, bytes.Repeat([]byte{0xFF}, 32))
 
 		_, err = m.UnsealKeyWithOptions(sealed)
-		if err != ErrPCRMismatch {
+		if !errors.Is(err, ErrPCRMismatch) {
 			t.Errorf("expected ErrPCRMismatch, got %v", err)
 		}
 	})
@@ -214,7 +215,7 @@ func TestMockKeyManagerGenerateAndSealWithOptions(t *testing.T) {
 		t.Errorf("Version = %d, want %d", sealed.Version, SealedDataV2)
 	}
 
-	// Should be able to unseal with correct password
+	// Should be able to unseal with the correct password
 	_, err = m.UnsealKeyWithOptions(sealed, WithPassword(password))
 	if err != nil {
 		t.Fatalf("UnsealKeyWithOptions failed: %v", err)
@@ -258,7 +259,7 @@ func TestMockKeyManagerReadPCRsEmpty(t *testing.T) {
 	m := NewMockKeyManager()
 
 	_, err := m.ReadPCRs(uint16(tpm2.TPMAlgSHA256))
-	if err != ErrInvalidPCRSelection {
+	if !errors.Is(err, ErrInvalidPCRSelection) {
 		t.Errorf("expected ErrInvalidPCRSelection, got %v", err)
 	}
 }
