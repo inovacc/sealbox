@@ -1,6 +1,6 @@
 // Example: TPM-backed Secret Store
 //
-// This example demonstrates how to use the keystore package to create
+// This example demonstrates how to use the sealbox package to create
 // a simple secret storage application with hardware-backed encryption.
 //
 // The TPM-sealed master key is used to derive encryption keys for
@@ -31,7 +31,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/inovacc/keystore/pkg/keystore"
+	"github.com/inovacc/sealbox/pkg/keystore"
 )
 
 const (

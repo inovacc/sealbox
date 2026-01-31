@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Cross-platform Go library (`package keystore`) for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations. Hardware-bound encryption where sealed keys cannot be extracted or used on other machines.
+**Sealbox** - Cross-platform Go library (`package keystore`) for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations. Hardware-bound encryption where sealed keys cannot be extracted or used on other machines.
 
-**Status:** Development - Phase 3 (Security Hardening) complete. See [ROADMAP.md](ROADMAP.md) for details.
+**Status:** Development - Phase 3 (Security Hardening) complete. See [ROADMAP.md](docs/ROADMAP.md) for details.
 
 ## Build & Test Commands
 
@@ -26,7 +26,7 @@ Single test: `go test -v -run TestFunctionName ./...`
 ### Project Structure
 
 ```
-keystore/
+sealbox/
 ├── *.go                    # Public API (package keystore)
 ├── internal/tpm/           # Forked go-tpm library
 │   ├── forked.md           # Attribution & upstream issues

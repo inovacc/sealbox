@@ -1,4 +1,4 @@
-module github.com/inovacc/keystore
+module github.com/inovacc/sealbox
 
 go 1.25
 

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/inovacc/keystore/cmd"
+import "github.com/inovacc/sealbox/cmd"
 
 func main() {
 	cmd.Execute()

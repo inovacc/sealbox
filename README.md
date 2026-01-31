@@ -1,8 +1,8 @@
-# Keystore - Hardware-Backed Key Management
+# Sealbox - Hardware-Backed Key Management
 
 A cross-platform Go package for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations.
 
-> **Status: Development** - See [ROADMAP.md](ROADMAP.md) for progress.
+> **Status: Development** - See [ROADMAP.md](docs/ROADMAP.md) for progress.
 
 ## What It Does
 
@@ -75,7 +75,7 @@ UNSEAL (every use):
 ## Installation
 
 ```bash
-go get github.com/inovacc/keystore
+go get github.com/inovacc/sealbox
 ```
 
 ## Requirements
@@ -102,7 +102,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/inovacc/keystore"
+    "github.com/inovacc/sealbox"
 )
 
 func main() {
@@ -507,7 +507,7 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 
 ## Documentation
 
-- [ROADMAP.md](ROADMAP.md) - Development phases, local issues, timeline
+- [ROADMAP.md](docs/ROADMAP.md) - Development phases, local issues, timeline
 - [internal/tpm/forked.md](pkg/keystore/internal/tpm/forked.md) - Upstream go-tpm issues by priority
 
 ## License
@@ -516,4 +516,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions are welcome! Please see the [ROADMAP.md](ROADMAP.md) for planned features and known issues.
+Contributions are welcome! Please see the [ROADMAP.md](docs/ROADMAP.md) for planned features and known issues.
