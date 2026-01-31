@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 	tpmpb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 	"google.golang.org/protobuf/proto"
 )
 

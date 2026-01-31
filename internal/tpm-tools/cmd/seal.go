@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 var sealHashAlgo = tpm2.AlgSHA256

@@ -4,10 +4,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 const (

@@ -10,14 +10,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/go-eventlog/proto/state"
 	"github.com/google/go-eventlog/register"
-	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 	"github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 	"github.com/inovacc/keystore/internal/tpm-tools/server"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier/oci"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -41,7 +42,7 @@ func NewClient(signer crypto.Signer) verifier.Client {
 	return &fakeClient{signer, nonce}
 }
 
-// CreateChallenge returns a hard coded, basic challenge.
+// CreateChallenge returns a hard-coded, basic challenge.
 //
 // If you have found this method is insufficient for your tests, this class must be updated to
 // allow for better testing.

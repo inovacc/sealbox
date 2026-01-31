@@ -4,7 +4,7 @@ import (
 	"crypto"
 	"fmt"
 
-	"github.com/google/go-tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 // GetSigningHashAlg returns the hash algorithm used for a signing key. Returns

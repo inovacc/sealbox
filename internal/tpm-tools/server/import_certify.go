@@ -9,8 +9,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/go-tpm/tpm2"
 	tpb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm/tpm2"
 )
 
 // This file aims to implement the verifier side of https://trustedcomputinggroup.org/wp-content/uploads/EK-Based-Key-Attestation-with-TPM-Firmware-Version-V1-RC1_9July2025.pdf#page=8

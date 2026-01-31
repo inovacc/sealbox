@@ -8,8 +8,8 @@ import (
 	"io"
 	"testing"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // LoadRandomExternalKey loads a randomly generated external key into the

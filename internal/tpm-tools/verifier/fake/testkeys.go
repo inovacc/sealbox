@@ -4,6 +4,8 @@ import (
 	"crypto"
 	_ "embed"
 	"fmt"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 //go:embed signer_rsa

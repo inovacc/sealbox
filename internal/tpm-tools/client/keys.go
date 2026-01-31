@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // Key wraps an active asymmetric TPM2 key. This can either be a signing key or

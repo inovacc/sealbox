@@ -10,12 +10,12 @@ import (
 	tgtest "github.com/google/go-tdx-guest/testing"
 	tgtestclient "github.com/google/go-tdx-guest/testing/client"
 	tgtestdata "github.com/google/go-tdx-guest/testing/testdata"
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier/util"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 	"google.golang.org/protobuf/proto"
 )
 

@@ -3,8 +3,8 @@ package client
 import (
 	"crypto/sha256"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // Calculations from Credential_Profile_EK_V2.0, section 2.1.5.3 - authPolicy

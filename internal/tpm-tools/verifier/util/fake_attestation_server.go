@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 
 	"cloud.google.com/go/confidentialcomputing/apiv1/confidentialcomputingpb"
+	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/net/http2"
 	"google.golang.org/protobuf/encoding/protojson"
 )

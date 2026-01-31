@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-tpm/tpm2"
-	"github.com/google/go-tpm/tpm2/transport"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
 	tpb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 	"github.com/inovacc/keystore/internal/tpm-tools/server"
+	"github.com/inovacc/keystore/internal/tpm/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpm2/transport"
 )
 
 func TestCreateCertifiedAKBlob(t *testing.T) {

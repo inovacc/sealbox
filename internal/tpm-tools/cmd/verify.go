@@ -9,9 +9,9 @@ import (
 	sv "github.com/google/go-sev-guest/verify"
 	"github.com/google/go-tdx-guest/proto/tdx"
 	tv "github.com/google/go-tdx-guest/verify"
-	"github.com/google/go-tpm/legacy/tpm2"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
 	"github.com/inovacc/keystore/internal/tpm-tools/server"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 )
@@ -158,8 +158,9 @@ func init() {
 	addInputFlag(debugCmd)
 	addFormatFlag(debugCmd)
 	addTeeNonceflag(debugCmd)
-	addCertifiedAKBlobFlag(debugCmd)
-	debugCmd.AddCommand(verifySVSMCmd)
-	addEKPubFlag(verifySVSMCmd)
-	addTeeTechnology(verifySVSMCmd)
+	// SVSM commands not supported:
+	// addCertifiedAKBlobFlag(debugCmd)
+	// debugCmd.AddCommand(verifySVSMCmd)
+	// addEKPubFlag(verifySVSMCmd)
+	// addTeeTechnology(verifySVSMCmd)
 }

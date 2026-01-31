@@ -1,3 +1,5 @@
+//go:build ignore
+
 package cmd
 
 import (
@@ -19,9 +21,9 @@ import (
 	"github.com/google/go-sev-guest/validate"
 	"github.com/google/go-sev-guest/verify"
 	"github.com/google/go-sev-guest/verify/trust"
-	"github.com/google/go-tpm/legacy/tpm2"
 	tpb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
 	"github.com/inovacc/keystore/internal/tpm-tools/server"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 	"github.com/spf13/cobra"
 )
 

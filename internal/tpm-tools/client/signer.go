@@ -9,8 +9,8 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 // Global mutex to protect against concurrent TPM access.

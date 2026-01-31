@@ -1,9 +1,11 @@
 package fake
 
+import "github.com/golang-jwt/jwt/v4"
+
 // Verify that Claims implements jwt.Claims.
 var _ jwt.Claims = Claims{}
 
-// Claims contains information to be formatted into a fake JWT.
+// Claims contain information to be formatted into a fake JWT.
 type Claims struct {
 	jwt.RegisteredClaims
 	ContainerImageSignatures []ContainerImageSignatureClaims `json:"container_image_signatures"`

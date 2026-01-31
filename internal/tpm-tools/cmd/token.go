@@ -11,11 +11,12 @@ import (
 
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/logging"
-	"github.com/google/go-tpm/legacy/tpm2"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier/models"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier/util"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"

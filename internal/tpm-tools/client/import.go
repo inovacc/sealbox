@@ -3,10 +3,10 @@ package client
 import (
 	"fmt"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/tpm"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 func loadHandle(k *Key, blob *pb.ImportBlob) (tpmutil.Handle, error) {

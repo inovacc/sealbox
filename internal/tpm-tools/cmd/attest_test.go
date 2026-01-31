@@ -12,11 +12,11 @@ import (
 	sgtestclient "github.com/google/go-sev-guest/testing/client"
 	tgtest "github.com/google/go-tdx-guest/testing"
 	tgtestclient "github.com/google/go-tdx-guest/testing/client"
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier/util"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 var getIndex = map[string]uint32{

@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/inovacc/keystore/internal/tpm-tools/verifier/oci"
+	"github.com/opencontainers/go-digest"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 

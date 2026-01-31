@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/go-tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 	"google.golang.org/api/impersonate"
 	"google.golang.org/api/option"
 )

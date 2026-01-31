@@ -3,7 +3,7 @@ package cmd
 import (
 	"io"
 
-	"github.com/google/go-tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
 )
 
 // There is no need for flags on Windows, as there is no concept of a TPM path.

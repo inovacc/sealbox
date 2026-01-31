@@ -5,8 +5,8 @@ import (
 	"io"
 	"math"
 
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 // Reserved Handles from "TCG TPM v2.0 Provisioning Guidance" - v1r1 - Table 2

@@ -9,11 +9,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	gecel "github.com/google/go-eventlog/cel"
-	"github.com/google/go-tpm/legacy/tpm2"
-	"github.com/google/go-tpm/tpmutil"
 	"github.com/inovacc/keystore/internal/tpm-tools/client"
 	"github.com/inovacc/keystore/internal/tpm-tools/internal/test"
 	pb "github.com/inovacc/keystore/internal/tpm-tools/proto/attest"
+	"github.com/inovacc/keystore/internal/tpm/legacy/tpm2"
+	"github.com/inovacc/keystore/internal/tpm/tpmutil"
 )
 
 func TestCosEventlog(t *testing.T) {
