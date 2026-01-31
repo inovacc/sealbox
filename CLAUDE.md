@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Cross-platform Go library (`package keystore`) for TPM 2.0 (Trusted Platform Module) key sealing and unsealing operations. Hardware-bound encryption where sealed keys cannot be extracted or used on other machines.
 
-**Status:** Development - contains critical bugs that block compilation (see Known Issues).
+**Status:** Development - Phase 3 (Security Hardening) complete. See [ROADMAP.md](ROADMAP.md) for details.
 
 ## Build & Test Commands
 
@@ -53,8 +53,17 @@ All platform files export the same public functions (`IsAvailable()`, `NewKeyMan
 ### Core Abstractions
 
 - **KeyManager** (`types.go`): Interface for TPM operations (SealKey, UnsealKey, GenerateAndSealKey, Close)
+- **KeyManagerWithOptions** (`types.go`): Extended interface with PCR/password policy support
 - **KeyStore** (`keystore.go`): Filesystem persistence with platform-specific default paths using functional options pattern
-- **SealedData** (`types.go`): Serializable struct containing TPM public/private areas
+- **SealedData** (`types.go`): Versioned serializable struct (V1=basic, V2=with policy metadata)
+
+### Security Features (Phase 3)
+
+- **PCR Binding** (`seal_options.go`): Seal keys to Platform Configuration Register values
+- **Password Protection** (`seal_options.go`): Optional password requirement for unsealing
+- **Policy Sessions** (`policy.go`): TPM policy computation and session management
+- **Windows ACLs** (`keystore_windows.go`): Proper Windows file permissions using internal acl package
+- **Memory Zeroing** (`security.go`): `SecureZero()` and `WithKeyCleanup()` for sensitive data
 
 ### High-Level API
 
@@ -68,19 +77,23 @@ All platform files export the same public functions (`IsAvailable()`, `NewKeyMan
 - `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
   - See `internal/tpm/forked.md` for upstream issues (46 open)
 
-## Known Issues (Critical)
-
-Must be fixed before code compiles:
-
-| Issue | File | Line |
-|-------|------|------|
-| Package mismatch: `doc.go` = `package tpm`, others = `package keystore` | `doc.go` | 59 |
-| Missing `DefaultAppName`, `DefaultKeyFileName` constants | `keystore.go` | 54 |
-
-See `ROADMAP.md` for full issue list and development phases.
-
 ## Testing Notes
 
 - Tests require TPM hardware or a software TPM simulator
 - Linux can use `swtpm` for simulation
 - Environment variable `TPM_DEVICE` overrides the default device path on Linux
+- Mock key manager available for unit tests without TPM: `NewMockKeyManager()`
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `types.go` | Core interfaces and SealedData struct |
+| `tpm_common.go` | Shared TPM operations (seal/unseal with options) |
+| `policy.go` | Policy session helpers for PCR/password |
+| `seal_options.go` | Functional options for sealing |
+| `security.go` | Memory zeroing utilities |
+| `keystore.go` | File-based key storage |
+| `keystore_windows.go` | Windows ACL handling |
+| `keystore_unix.go` | Unix permissions |
+| `mock_keymanager.go` | Mock for testing |

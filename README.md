@@ -64,8 +64,11 @@ UNSEAL (every use):
 
 - **Hardware-bound encryption** - Keys are sealed to the TPM and cannot be extracted
 - **Cross-platform** - Supports Linux and Windows (macOS Secure Enclave planned)
-- **No password required** - Authentication happens automatically via TPM
-- **Secure key storage** - Sealed blobs stored in platform-specific secure locations
+- **PCR binding** - Optional binding to Platform Configuration Register values
+- **Password protection** - Optional password requirement for unsealing
+- **Secure key storage** - Sealed blobs stored with platform-appropriate permissions
+- **Windows ACLs** - Proper Windows file permissions (current user only)
+- **Memory zeroing** - Utilities for clearing sensitive data from memory
 - **Simple API** - Easy-to-use interfaces for key management
 - **Forked go-tpm** - Includes forked [google/go-tpm](https://github.com/google/go-tpm) for customization
 
@@ -163,6 +166,60 @@ if err := store.Save(sealed); err != nil {
 fmt.Printf("Key sealed and stored at: %s\n", store.Path())
 ```
 
+### Security Options API
+
+For enhanced security, use policy-based sealing with PCR binding and/or password protection:
+
+```go
+import "github.com/inovacc/keystore/internal/tpm/tpm2"
+
+km, err := keystore.NewKeyManager()
+if err != nil {
+    log.Fatal(err)
+}
+defer km.Close()
+
+// Seal with password protection
+sealed, err := km.SealKeyWithOptions(myKey,
+    keystore.WithPassword([]byte("my-secret-password")),
+)
+
+// Seal with PCR binding (key only works if PCRs match)
+sealed, err := km.SealKeyWithOptions(myKey,
+    keystore.WithPCRs(tpm2.TPMAlgSHA256, 0, 1, 7),
+)
+
+// Seal with both password AND PCR binding
+sealed, err := km.SealKeyWithOptions(myKey,
+    keystore.WithPassword([]byte("password")),
+    keystore.WithPCRs(tpm2.TPMAlgSHA256, 0, 7),
+)
+
+// Unseal with password
+key, err := km.UnsealKeyWithOptions(sealed,
+    keystore.WithPassword([]byte("my-secret-password")),
+)
+
+// Read current PCR values
+pcrValues, err := km.ReadPCRs(uint16(tpm2.TPMAlgSHA256), 0, 1, 7)
+```
+
+### Memory Security
+
+Use the provided utilities to zero sensitive data after use:
+
+```go
+// Zero a byte slice
+keystore.SecureZero(sensitiveKey)
+
+// Use key with automatic cleanup
+err := keystore.WithKeyCleanup(key, func(k []byte) error {
+    // Use the key
+    return encrypt(data, k)
+})
+// Key is automatically zeroed after function returns
+```
+
 ## API Reference
 
 ### Functions
@@ -232,6 +289,28 @@ type KeyManager interface {
 }
 ```
 
+#### `KeyManagerWithOptions`
+
+Extended interface for policy-based sealing (PCR binding, passwords):
+
+```go
+type KeyManagerWithOptions interface {
+    KeyManager
+
+    // SealKeyWithOptions seals with optional PCR binding and/or password
+    SealKeyWithOptions(key []byte, opts ...SealOption) (*SealedData, error)
+
+    // UnsealKeyWithOptions unseals data requiring policy authorization
+    UnsealKeyWithOptions(data *SealedData, opts ...SealOption) ([]byte, error)
+
+    // GenerateAndSealKeyWithOptions generates and seals with options
+    GenerateAndSealKeyWithOptions(opts ...SealOption) (*SealedData, error)
+
+    // ReadPCRs reads current PCR values
+    ReadPCRs(hash uint16, pcrs ...uint) ([][]byte, error)
+}
+```
+
 #### `KeyStore`
 
 ```go
@@ -259,10 +338,34 @@ type KeyStore interface {
 
 ```go
 type SealedData struct {
-    PublicArea       []byte `json:"public_area"`
-    PrivateArea      []byte `json:"private_area"`
-    SealedBlobPublic []byte `json:"sealed_blob_public"`
+    // Version indicates format (0/1=V1, 2=V2 with policy)
+    Version          int                  `json:"version,omitempty"`
+    PublicArea       []byte               `json:"public_area"`
+    PrivateArea      []byte               `json:"private_area"`
+    SealedBlobPublic []byte               `json:"sealed_blob_public"`
+    // V2 fields (policy metadata)
+    PolicyDigest     []byte               `json:"policy_digest,omitempty"`
+    PCRSelection     *SealedPCRSelection  `json:"pcr_selection,omitempty"`
+    HasPassword      bool                 `json:"has_password,omitempty"`
 }
+```
+
+#### `SealOption`
+
+Functional options for sealing operations:
+
+```go
+// Protect with password
+keystore.WithPassword(password []byte)
+
+// Bind to PCR values (reads current values)
+keystore.WithPCRs(hash tpm2.TPMIAlgHash, pcrs ...uint)
+
+// Bind to specific PCR digest
+keystore.WithPCRDigest(hash tpm2.TPMIAlgHash, digest []byte, pcrs ...uint)
+
+// Enable session encryption
+keystore.WithSessionEncryption()
 ```
 
 ## Storage Locations
@@ -285,10 +388,12 @@ This package protects against:
 - **Offline attacks** - Sealed keys cannot be decrypted without the TPM
 - **Key extraction** - Key material never leaves the TPM in plaintext
 - **Credential theft** - Even with disk access, attacker cannot recover keys
+- **System state changes** - PCR binding detects boot/config modifications
+- **Stolen sealed blobs** - Password protection adds another layer
 
 This package does NOT protect against:
 - **Physical TPM attacks** - Advanced hardware attacks on the TPM chip
-- **Runtime memory attacks** - Keys are briefly in memory during use
+- **Runtime memory attacks** - Keys are briefly in memory during use (use `SecureZero()`)
 - **Malware with root access** - Can use TPM while system is running
 
 ### Best Practices
@@ -297,6 +402,9 @@ This package does NOT protect against:
 2. **Machine-bound** - Keys only work on the machine where they were created
 3. **BIOS updates** - May invalidate sealed keys (re-seal after update)
 4. **TPM clear** - Clearing TPM in BIOS destroys all sealed keys
+5. **Use PCR binding** - Bind to PCRs 0, 1, 7 to detect boot changes
+6. **Add password protection** - Combine with PCR binding for defense in depth
+7. **Zero sensitive memory** - Use `SecureZero()` or `WithKeyCleanup()` after use
 
 ### Key Derivation
 
@@ -351,13 +459,26 @@ Get-Tpm
 
 ```go
 var (
+    // TPM availability
     ErrTPMNotAvailable        = errors.New("TPM device not available")
     ErrTPMNotSupported        = errors.New("TPM not supported on this platform")
+
+    // Key operations
     ErrNoSealedKey            = errors.New("no sealed key found")
     ErrKeyExists              = errors.New("sealed key already exists")
     ErrSealFailed             = errors.New("failed to seal key to TPM")
     ErrUnsealFailed           = errors.New("failed to unseal key from TPM")
     ErrKeyStoreNotInitialized = errors.New("key store not initialized")
+    ErrKeyTooLarge            = errors.New("key exceeds maximum sealable size")
+    ErrKeyEmpty               = errors.New("cannot seal empty key")
+    ErrInvalidSealedData      = errors.New("sealed data has invalid fields")
+
+    // Policy errors (Phase 3)
+    ErrPCRMismatch            = errors.New("PCR values do not match sealed policy")
+    ErrPasswordRequired       = errors.New("password required to unseal this key")
+    ErrInvalidPassword        = errors.New("invalid password for sealed key")
+    ErrPolicyFailed           = errors.New("policy session failed")
+    ErrInvalidPCRSelection    = errors.New("invalid PCR selection")
 )
 ```
 
@@ -378,7 +499,7 @@ TPM_DEVICE=/tmp/tpm go test -v ./...
 ## Dependencies
 
 - `internal/tpm/` - Forked from [github.com/google/go-tpm](https://github.com/google/go-tpm)
-  - See [internal/tpm/forked.md](internal/tpm/forked.md) for 46 tracked upstream issues
+  - See [internal/tpm/forked.md](internal/tpm/forked.md) for 64 tracked upstream issues
 
 ## Examples
 
