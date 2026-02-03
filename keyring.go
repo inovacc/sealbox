@@ -345,6 +345,23 @@ func (kr *Keyring) GetProfileVersion(name string) (int, error) {
 	return profile.Version, nil
 }
 
+// GetProfileMetadata returns metadata for a profile's key.
+func (kr *Keyring) GetProfileMetadata(name string) (*ProfileMetadata, error) {
+	kr.mu.RLock()
+	defer kr.mu.RUnlock()
+
+	profile, exists := kr.profiles[name]
+	if !exists {
+		return nil, ErrProfileNotFound
+	}
+
+	return &ProfileMetadata{
+		Version:   profile.Version,
+		CreatedAt: profile.CreatedAt,
+		RotatedAt: profile.RotatedAt,
+	}, nil
+}
+
 // IsModified returns true if the keyring has unsaved changes.
 func (kr *Keyring) IsModified() bool {
 	kr.mu.RLock()

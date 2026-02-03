@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 var (
@@ -574,6 +575,25 @@ func (ks *Keystore) GetProfileKeyVersion(profile string) (int, error) {
 	}
 
 	return ks.keyring.GetProfileVersion(profile)
+}
+
+// ProfileMetadata contains profile key metadata for rotation tracking.
+type ProfileMetadata struct {
+	Version   int
+	CreatedAt time.Time
+	RotatedAt time.Time
+}
+
+// GetProfileMetadata returns metadata for a profile's key.
+func (ks *Keystore) GetProfileMetadata(profile string) (*ProfileMetadata, error) {
+	ks.mu.RLock()
+	defer ks.mu.RUnlock()
+
+	if ks.closed {
+		return nil, ErrKeystoreClosed
+	}
+
+	return ks.keyring.GetProfileMetadata(profile)
 }
 
 // Path returns the keystore path.
