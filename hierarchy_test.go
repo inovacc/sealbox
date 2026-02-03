@@ -1,7 +1,6 @@
 package sealbox
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -416,7 +415,7 @@ func TestKeyHierarchyManager_MultipleKeys(t *testing.T) {
 
 	// Unseal each key
 	for i := range 5 {
-		name := "key-" + fmt.Sprint(rune('a'+i))
+		name := "key-" + string(rune('a'+i))
 
 		key, err := mgr.UnsealKey(name)
 		if err != nil {
