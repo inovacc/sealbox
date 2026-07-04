@@ -11,13 +11,8 @@ import (
 	"github.com/google/go-tpm/tpm2/transport"
 )
 
-const (
-	// sealedKeySize is the key size for sealed keys (32 bytes = 256 bits for AES-256)
-	sealedKeySize = 32
-
-	// maxSealableSize is the maximum size of data that can be sealed to the TPM
-	maxSealableSize = 1024
-)
+// sealedKeySize and maxSealableSize moved to key_sizes.go (unconstrained) so
+// mock_keymanager.go compiles on darwin. See that file for the rationale.
 
 // baseKeyManager contains common TPM operations shared across platforms.
 type baseKeyManager struct {
